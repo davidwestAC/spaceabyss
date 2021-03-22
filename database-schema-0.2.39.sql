@@ -57,7 +57,7 @@ CREATE TABLE `addiction_linkers` (
   `updated_at` datetime DEFAULT NULL,
   `tick_count` int DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=450 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=476 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -74,7 +74,7 @@ CREATE TABLE `admin_logs` (
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=285 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=286 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -135,7 +135,7 @@ CREATE TABLE `areas` (
   `price` int DEFAULT '0',
   `auto_market` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -193,7 +193,7 @@ CREATE TABLE `assemblies` (
   `amount_completed` int DEFAULT '0',
   `total_amount` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3921 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=3942 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -368,7 +368,7 @@ CREATE TABLE `eating_linkers` (
   `updated_at` datetime DEFAULT NULL,
   `npc_id` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5560 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=5591 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -389,7 +389,7 @@ CREATE TABLE `equipment_linkers` (
   `body_id` int DEFAULT NULL,
   `amount` int DEFAULT '1',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2075 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2106 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -485,7 +485,7 @@ CREATE TABLE `faction_linkers` (
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -505,7 +505,7 @@ CREATE TABLE `factions` (
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -645,7 +645,7 @@ CREATE TABLE `inventory_items` (
   `npc_id` int DEFAULT NULL,
   `body_id` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=28050 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=28454 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -680,7 +680,7 @@ CREATE TABLE `killed_linkers` (
   `monster_type_id` int DEFAULT NULL,
   `monster_count` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=6627 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=6651 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -896,7 +896,7 @@ CREATE TABLE `monsters` (
   `current_spawn_linker_id` int DEFAULT '0',
   `coord_id` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=25186 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=25389 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1315,7 +1315,7 @@ CREATE TABLE `objects` (
   `spawner_tick_count` int DEFAULT '0',
   `current_spawn_linker_id` int DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=134453 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=134993 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1381,7 +1381,7 @@ CREATE TABLE `planet_coords` (
   KEY `planet_id_index` (`planet_id`),
   KEY `monster_id_index` (`monster_id`),
   KEY `object_id_index` (`object_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=495528 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=495529 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1623,7 +1623,7 @@ CREATE TABLE `player_logs` (
   KEY `year_index` (`year`),
   KEY `month_index` (`month`),
   KEY `scope_index` (`scope`)
-) ENGINE=MyISAM AUTO_INCREMENT=297 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=300 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1661,7 +1661,7 @@ CREATE TABLE `player_research_linkers` (
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=181 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=182 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1736,8 +1736,9 @@ CREATE TABLE `players` (
   `skin_object_type_id` int DEFAULT NULL,
   `description` text,
   `last_login` bigint DEFAULT NULL,
+  `is_deleted` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=251 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=256 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1841,7 +1842,7 @@ CREATE TABLE `researches` (
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2107 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2133 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1858,7 +1859,7 @@ CREATE TABLE `rules` (
   `updated_at` datetime DEFAULT NULL,
   `object_id` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=352 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=353 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1914,7 +1915,7 @@ CREATE TABLE `ship_coords` (
   `is_damaged` tinyint(1) DEFAULT '0',
   `spawned_monster_id` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=192639 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=193393 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1974,7 +1975,7 @@ CREATE TABLE `skin_purchase_linkers` (
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2039,7 +2040,7 @@ CREATE TABLE `spawned_events` (
   `planet_event_linker_id` int DEFAULT NULL,
   `is_despawned` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=65059 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=65425 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2210,7 +2211,7 @@ CREATE TABLE `users` (
   `is_banned` tinyint(1) DEFAULT '0',
   `unread_message_count` int DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=247 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=250 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!50112 SET @disable_bulk_load = IF (@is_rocksdb_supported, 'SET SESSION rocksdb_bulk_load = @old_rocksdb_bulk_load', 'SET @dummy_rocksdb_bulk_load = 0') */;
 /*!50112 PREPARE s FROM @disable_bulk_load */;
@@ -2226,4 +2227,4 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-03-19 13:31:01
+-- Dump completed on 2021-03-22 16:03:06

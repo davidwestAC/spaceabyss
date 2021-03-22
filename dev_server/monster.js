@@ -948,10 +948,13 @@ async function getCoordAndRoom(dirty, monster_index) {
 
             coord_index = await getCoordIndex(dirty, monster_index, 'ship');
 
-            if(coord_index !== -1) {
+            if(coord_index !== -1 && dirty.ship_coords[coord_index]) {
                 room = "ship_" + dirty.ship_coords[coord_index].ship_id;
                 scope = "ship";
                 coord = dirty.ship_coords[coord_index];
+            } else if(coord_index !== -1 && !dirty.ship_coords[coord_index]) {
+                log(chalk.yellow("Looks like a monster, id: " +  dirty.monsters[monster_index].id + " has an outdated ship coord index"));
+                dirty.monsters[monster_index].ship_coord_index = -1;
             }
         } else if(dirty.monsters[monster_index].coord_id) {
 

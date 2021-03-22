@@ -2533,6 +2533,10 @@ async function loginPlayer(socket, dirty, data) {
             let already_connected = false;
 
 
+            if(helper.notFalse(logging_in_player.is_deleted)) {
+                socket.emit('login_data', { 'status':'Player Is Deleted' });
+                return false;
+            }
     
             // Prevent players from accidently logging in multiple times
             for(var socket_id in io.sockets.sockets) {
@@ -2542,6 +2546,7 @@ async function loginPlayer(socket, dirty, data) {
                     return false;
                 }
             }
+
 
     
             let placed_player = false;

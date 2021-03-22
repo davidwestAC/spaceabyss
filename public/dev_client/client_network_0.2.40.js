@@ -1175,6 +1175,8 @@ socket.on('login_data', function(data) {
 
     } else if(data.status === 'Failed. You Are Banned') {
         $('#login_status').append("<span style='color:red;'>Login Failed. Your account is banned. Please email spaceabyss@alphacoders.com for more details.</span>");
+    } else if(data.status === 'Player Is Deleted') {
+        $('#login_status').append("<span style='color:red;'>Login Failed. Your player is deleted. Please email spaceabyss@alphacoders.com for more details.</span>");
     }
     
     else {

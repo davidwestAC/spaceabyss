@@ -5981,7 +5981,7 @@ exports.eat = eat;
                 return false;
             }
 
-            console.log('Received message: ' + data.message + " with scope: " + data.scope);
+            //console.log('Received message: ' + data.message + " with scope: " + data.scope);
             var message = socket.player_name + ": " + data.message;
 
 
@@ -6472,7 +6472,7 @@ exports.eat = eat;
 
 
             let object_type_used_for_repair_index = main.getObjectTypeIndex(object_type_used_for_repair_id);
-            console.log("We will use " + dirty.object_types[object_type_used_for_repair_index].name + " to repair this");
+            //console.log("We will use " + dirty.object_types[object_type_used_for_repair_index].name + " to repair this");
 
             let inventory_item_index = dirty.inventory_items.findIndex(function(obj) { return obj &&
                 obj.player_id === dirty.repairing_linkers[i].player_id && obj.object_type_id === dirty.object_types[object_type_used_for_repair_index].id; });
@@ -9483,8 +9483,8 @@ exports.eat = eat;
 
             let debug_object_type_ids = [];
 
-            //log(chalk.green("Got pick up request"));
-            //console.log(data);
+            log(chalk.green("Got pick up request"));
+            console.log(data);
 
 
             if(typeof socket.player_index === "undefined" || socket.player_index === -1) {
@@ -9797,6 +9797,12 @@ exports.eat = eat;
                     
                     dirty.objects[object_index].ship_coord_id = false;
                     dirty.objects[object_index].ship_coord_index = -1;
+                    dirty.objects[object_index].has_change = true;
+                } else if(player_info.scope === 'galaxy') {
+                    await main.updateCoordGeneric(socket, { 'coord_index': picking_up_coord_index, 'object_id': false });
+                    
+                    dirty.objects[object_index].coord_id = false;
+                    dirty.objects[object_index].coord_index = -1;
                     dirty.objects[object_index].has_change = true;
                 }
 

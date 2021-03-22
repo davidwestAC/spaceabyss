@@ -1,3 +1,19 @@
+## [0.2.39] - 2021-03-22
+
+
+### Fixed
+- Issue with not exporting monster.getCoordIndex
+- Issue with picking objects up from the galaxy not removing them from the coord (hotfixed in 0.2.38 on 3/19/2020)
+- Issue with monsters having an outdated ship coord index
+
+
+### Changed
+- Asteroid city spawn from 2 to 1 at a time
+- Diamond Asteroids from Asteroid Cities are now more rare
+- Players are now soft deleted initially, instead of fully deleted. Need to expand on this system (will add in the user that deleted it, 
+reasoning, and require email verification to fully delete)
+
+
 ## [0.2.38] - 2021-03-18
 
 ### Added

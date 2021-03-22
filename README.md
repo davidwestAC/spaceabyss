@@ -34,6 +34,10 @@ The client is in public/dev_client
 
 The server is in dev_server
 
+If you want only the schema of the database, you can use database-schema-0.2.38.sql
+
+If you want to have a populated list of objects types, monster types, and how they interact with each other, You'll also want to import populated-game-structure-0.2.38.sql
+
 My current ideas are collected at helper_info/ideas.txt. There are other useful files for world building in there.
 
 # Contact

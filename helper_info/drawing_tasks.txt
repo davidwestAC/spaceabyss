@@ -85,9 +85,22 @@ Some nebulae for cool backgrounds in space
 ***************************************
 
 
-
+Keratin
+Size: 18x18 max
+Frames Needed: 1 design
+Notes: We did a Keratin armor set in batch #24. I need just a small sprite of a piece of Keratin. 
 
 Beetle Knight
+
+Voon Mech
+
+Nulrom Beacon
+
+Growing Abomination
+
+Voon Vial
+
+Nulrom Egg Sack
 
 Rain Floor
 Type: Animated Floor/Weather Effect

@@ -11,6 +11,7 @@ DOING NOW:
     Whenever I see a getPlanetCoordIndex, getShipCoordIndex, getCoordIndex, see if it's on a monster,object, or player, and switch it to TYPE.getCoordIndex()
 
 
+    events are spawning objects even if the object type isn't spawned as an object, just an object type
     
 
     the Broken Giant can only be salvaged at the left bottom tile, despite all of them allowing you to press salvage
@@ -26,7 +27,20 @@ DOING NOW:
 
     It's possible there's a bug with the poison, or being disconnected
 
+    Galaxy coords that players moved through are weird
+
+    Cadian's ship got left in the galaxy. 
+        I think maybe this happens when you know it's in the galaxy, and they log off while you are off screen? Or different room? (in ship view?)
+
+    Vueg body not idling after movement
+
     Poison not going away
+
+    Vueg farming skill not applying
+
+    Freeze skill not increasing with the icer pistol
+
+    Add in trash asteroid
 
     Not sure gifting from admin is working
 

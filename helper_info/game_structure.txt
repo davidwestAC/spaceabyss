@@ -422,13 +422,15 @@ Slagcell
                             Water -6 to -7
                             Slaver -5 to -6
                             Corporation -5 to -6
+                            Frozen -5 to -6
                             Acid -3 to -4
 
                                 TIER 8
                                 Mountain -5 to -6
                                 Inferno -3 and -4
                                 Biogrove -7 and -8
-                                Frozen -5 to -6
+                                Frozen -7 to -8
+                                
                                 Acid -5 to -6
 
                                     TIER 9
