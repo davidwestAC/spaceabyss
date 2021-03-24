@@ -2367,15 +2367,15 @@ function generatePlayerInfoDisplay() {
     html_string += "<br>";
 
 
-    // FREEZE
-    html_string += "Freeze: " + players[client_player_index].freeze_skill_points;
+    // FREEZING
+    html_string += "Freezing: " + players[client_player_index].freezing_skill_points;
     // lets start doing some client side level stuff just to see how it shows
-    let freeze_level = 1 + Math.floor(level_modifier * Math.sqrt(players[client_player_index].freeze_skill_points));
+    let freezing_level = 1 + Math.floor(level_modifier * Math.sqrt(players[client_player_index].freezing_skill_points));
 
-    html_string += " Level: " + freeze_level;
+    html_string += " Level: " + freezing_level;
 
-    if (freeze_level > 1) {
-        let additional_damage = freeze_level - 1;
+    if (freezing_level > 1) {
+        let additional_damage = freezing_level - 1;
         html_string += " <span class='tag is-success'>+" + additional_damage + "  <i class=\"fas fa-swords\"></i></span>";
 
     }
@@ -7231,10 +7231,10 @@ function checkLevelIncrease(old_player_data, new_player_data) {
         text_important_time = our_time;
     }
 
-    let old_freeze_level = 1 + Math.floor(level_modifier * Math.sqrt(old_player_data.freeze_skill_points));
-    let new_freeze_level = 1 + Math.floor(level_modifier * Math.sqrt(new_player_data.freeze_skill_points));
-    if (new_freeze_level > old_freeze_level) {
-        addInfoNumber(drawing_x, drawing_y, { 'fill_color': '#FFFFFF', 'text': 'Freeze Skill Leveled Up!' });
+    let old_freezing_level = 1 + Math.floor(level_modifier * Math.sqrt(old_player_data.freezing_skill_points));
+    let new_freezing_level = 1 + Math.floor(level_modifier * Math.sqrt(new_player_data.freezing_skill_points));
+    if (new_freezing_level > old_freezing_level) {
+        addInfoNumber(drawing_x, drawing_y, { 'fill_color': '#FFFFFF', 'text': 'Freezing Skill Leveled Up!' });
         text_important.setText("Freeze Skill Leveled Up!");
         text_important.setVisible(true);
         text_important_time = our_time;
@@ -7610,7 +7610,7 @@ function processFile(key, type, texture) {
 
 function processPlayerFile(key, type, texture) {
 
-    console.log("In processPlayerFile");
+    //console.log("In processPlayerFile");
     let scene_game = game.scene.getScene('sceneGame');
 
 
@@ -10483,7 +10483,6 @@ function showClickMenuObject(coord) {
 
     // If the object type is a stairs, and the player is standing on the coord, let them move onto it to move up
     if(object_types[object_type_index].is_portal && coord.id === client_player_info.coord.id) {
-        console.log("Player right clicked on portal that they are on");
         $('#click_menu').append("<button id='moveportal' class='button is-default'>Go Back</button>");
         
     }

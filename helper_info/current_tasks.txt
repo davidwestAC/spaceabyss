@@ -11,38 +11,28 @@ DOING NOW:
     Whenever I see a getPlanetCoordIndex, getShipCoordIndex, getCoordIndex, see if it's on a monster,object, or player, and switch it to TYPE.getCoordIndex()
 
 
-    events are spawning objects even if the object type isn't spawned as an object, just an object type
-    
-
-    the Broken Giant can only be salvaged at the left bottom tile, despite all of them allowing you to press salvage
-    once salvaged, the upper two tiles dont get refreshed
+    Freeze skill not increasing with the icer pistol
 
     Poison seems to not update at all, neither damaging you nor disappearing
     The shift key (I wish for a permanent keep-open button) does not keep the windows open when putting an item into the container, it also lags one action behind.
-    I like the game, despite having some rough edges! Keep up the great work
 
-    My internet provider turned off the connection, which caused this. I wasn't able to cause this issue myself, even with changing IP midgame. In my lost inventory I had full territe equipment, the first time a lot of food from the desert, in case it helps
 
     I wouldn't hate players being able to drive through and explode salvagable stuff
 
-    It's possible there's a bug with the poison, or being disconnected
+
 
     Galaxy coords that players moved through are weird
 
     Cadian's ship got left in the galaxy. 
         I think maybe this happens when you know it's in the galaxy, and they log off while you are off screen? Or different room? (in ship view?)
 
-    Vueg body not idling after movement
 
     Poison not going away
 
-    Vueg farming skill not applying
 
-    Freeze skill not increasing with the icer pistol
 
     Add in trash asteroid
 
-    Not sure gifting from admin is working
 
     Could let players know when their AI kills someone
 

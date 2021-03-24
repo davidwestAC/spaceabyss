@@ -178,7 +178,7 @@ async function calculateDefense(dirty, monster_index, damage_types = [], attack_
 
 }
 
-exports.calculcateDefense = calculateDefense;
+exports.calculateDefense = calculateDefense;
 
 
 /**

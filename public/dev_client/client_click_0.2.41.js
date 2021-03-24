@@ -357,7 +357,7 @@ $(document).on('click', 'button', function () {
     }
 
     if(split_name[0] === 'convert') {
-        console.log("Got convert data");
+        //console.log("Got convert data");
 
         let converter_object_id = $('#' + clicked_id).attr('converter_object_id');
 
@@ -369,7 +369,7 @@ $(document).on('click', 'button', function () {
             socket.emit('convert_data', { 'input_type': 'inventory_item', inventory_item_id: inventory_item_id, converter_object_id: converter_object_id,
                 'amount': amount });
 
-            console.log("Sent convert_data with inventory_item_id: " + inventory_item_id);
+            //console.log("Sent convert_data with inventory_item_id: " + inventory_item_id);
         }
         // Or putting in our HP (life force)
         else if(split_name[1] === 'hp') {
@@ -531,11 +531,8 @@ $(document).on('click', 'button', function () {
 
         $('#click_menu').append("<a target='_blank' class='button is-success is-small' href='https://space.alphacoders.com/site/tutorial'>View Our Tutorial!</a><br>");
         if(client_player_index !== -1 && players[client_player_index]) {
-            console.log("showing report");
             $('#click_menu').append("<a target='_blank' class='button is-info is-small' href='https://space.alphacoders.com/player/view/" + players[client_player_index].id + "'>Report A Problem</a><br>");
-        } else {
-            console.log("not showing report");
-        }
+        } 
         
 
         // Go through recent failure messages
@@ -834,7 +831,7 @@ $(document).on('click', 'button', function () {
 
     if(split_name[0] === "pickup") {
 
-        console.log("Got pickup click");
+        //console.log("Got pickup click");
 
 
         if($('#' + clicked_id).attr('object_id')) {

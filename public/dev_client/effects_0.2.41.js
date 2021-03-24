@@ -183,6 +183,18 @@ function addEffect(data) {
             
             // testing
             effect_type = 'projectile';
+        } else if(data.damage_types[i] === 'freezing') {
+            new_texture_key = 'electric-ball-effect';
+            new_texture_animation_key = 'electric-ball-effect-animation';
+
+            // Works well when a player is the destination
+
+            data.x += 32;
+            data.y += 32;
+            
+            
+            // testing
+            effect_type = 'projectile';
         } 
         else if(data.damage_types[i] === 'gravity') {
             new_texture_key = 'gravity-effect';
@@ -619,7 +631,6 @@ function updateEffectSprites(moved_type, moved_index) {
 
     
         } else if(effect_sprites[i] && effect_sprites[i].effect_type === 'projectile') {
-            console.log("Have projectile sprite");
 
             if(effect_sprites[i].visible ) {
 

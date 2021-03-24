@@ -51,7 +51,7 @@ const world = require('./world.js');
                     && obj.being_attacked_type === 'npc' && obj.being_attacked_id === parseInt(data.npc_id); });
 
             } else if(data.object_id) {
-                console.log("Was sent in object id: " + data.object_id);
+                //console.log("Was sent in object id: " + data.object_id);
 
                 // It could be player v object, or object v object if we are in the galaxy
                 let player_index = await player.getIndex(dirty, { 'player_id': socket.player_id });
@@ -2019,6 +2019,7 @@ const world = require('./world.js');
 
         } catch(error) {
             log(chalk.red("Error in playerAttackMonster: " + error));
+            console.error(error);
         }
 
 

@@ -452,6 +452,7 @@ exports.getSpawnedEventIndex = getSpawnedEventIndex;
  * @param {number=} data.coord_index
  * @param {number=} data.planet_id
  * @param {number=} data.planet_event_linker_id 
+ * @param {boolean=} data.force - Used when an admin is spawning the event. Forces us past limit checks
  * @returns {Promise<number>} spawned_event_index
  */
 async function spawn(dirty, event_index, data) {
@@ -460,7 +461,7 @@ async function spawn(dirty, event_index, data) {
 
         
 
-        let debug_event_ids = [];
+        let debug_event_ids = [108];
 
         let planet_index = -1;
         let planet_event_linker_index = -1;
@@ -616,6 +617,7 @@ async function spawn(dirty, event_index, data) {
             origin_tile_y = dirty.coords[data.coord_index].tile_y;
 
             event_scope = 'galaxy';
+            origin_coord_index = data.coord_index;
         } else if(data.scope === 'galaxy') {
 
 
@@ -662,12 +664,22 @@ async function spawn(dirty, event_index, data) {
                 spawned_event.planet_id === dirty.planets[planet_index].id && helper.isFalse(spawned_event.is_despawned));
 
             if(currently_spawned.length >= dirty.planet_event_linkers[planet_event_linker_index].limit_per_planet) {
-                can_spawn = false;
-                if(debug_event_ids.indexOf(dirty.events[event_index].id) !== -1) {
-                    log(chalk.yellow("Can't spawn. Planet is at limit. Found " + currently_spawned.length + " existing events of this type"));
-                }
 
-                return -1;
+                if(typeof data.force === 'undefined') {
+                    can_spawn = false;
+
+                    if(debug_event_ids.indexOf(dirty.events[event_index].id) !== -1) {
+                        log(chalk.yellow("Can't spawn. Planet is at limit. Found " + currently_spawned.length + " existing events of this type"));
+                    }
+    
+                    return -1;
+                } else {
+                    if(debug_event_ids.indexOf(dirty.events[event_index].id) !== -1) {
+                        log(chalk.yellow("Admin is forcing spawn. Planet is at limit. Found " + currently_spawned.length + " existing events of this type"));
+                    }
+                }
+                
+
             }
 
             //console.log("Found " + currently_spawned.length + " of that event already on the planet");
@@ -685,11 +697,20 @@ async function spawn(dirty, event_index, data) {
             }
 
             if(spawned_in_galaxy_count >= dirty.events[event_index].galaxy_limit) {
-                if(debug_event_ids.indexOf(dirty.events[event_index].id) !== -1) {
-                    log(chalk.yellow("Can't spawn. Galaxy is at limit. Found " + spawned_in_galaxy_count + " existing events of this type"));
+
+                if(typeof data.force === 'undefined') {
+                    if(debug_event_ids.indexOf(dirty.events[event_index].id) !== -1) {
+                        log(chalk.yellow("Can't spawn. Galaxy is at limit. Found " + spawned_in_galaxy_count + " existing events of this type"));
+                    }
+    
+                    return -1;
+                } else {
+                    if(debug_event_ids.indexOf(dirty.events[event_index].id) !== -1) {
+                        log(chalk.yellow("Admin is forcing spawn! Galaxy is at limit. Found " + spawned_in_galaxy_count + " existing events of this type"));
+                    }
                 }
 
-                return -1;
+
             }
 
         }
@@ -1052,56 +1073,78 @@ async function spawn(dirty, event_index, data) {
 
 
                 if(event_linker.object_type_id) {
-                    let insert_object_type_data = { 'object_type_id': event_linker.object_type_id, 'spawned_event_id': spawned_event_id };
-                    let new_object_index = await world.insertObjectType(false, dirty, insert_object_type_data);
-                    
-                    if(new_object_index === -1) {
-                        log(chalk.yellow("Failed to insert object type in event.spawn"));
-                        return false;
-                    }
 
-                    let new_object_id = dirty.objects[new_object_index].id;
-                    
+                    let event_linker_object_type_index = main.getObjectTypeIndex(event_linker.object_type_id);
 
-                    if(new_object_index === -1) {
-                        log(chalk.yellow("Was unable to get object index from object id: " + new_object_id + " in event.spawn"));
-                        return false;
-                    }
-
-                    if(debug_event_ids.indexOf(dirty.events[event_index].id) !== -1) {
-                        console.log("Created new object id: " + dirty.objects[new_object_index].id +
-                            " with spawned_event_id: " + dirty.objects[new_object_index].spawned_event_id);
-                    }
-
-                    if(debug_event_ids.indexOf(dirty.events[event_index].id) !== -1) {
-                        console.log("Linker spawns_off_grid is: " + event_linker.spawns_off_grid);
-                    }
-
-                    if(helper.isFalse(event_linker.spawns_off_grid)) {
+                    if(dirty.object_types[event_linker_object_type_index].assembled_as_object) {
+                        let insert_object_type_data = { 'object_type_id': event_linker.object_type_id, 'spawned_event_id': spawned_event_id };
+                        let new_object_index = await world.insertObjectType(false, dirty, insert_object_type_data);
                         
-                        if(event_scope === 'planet') {
-                            await game_object.place(false, dirty, { 'object_index': new_object_index,
-                                'planet_coord_index': linker_coord_index });
-
-                            //console.log("Object's planet_coord_id: " + dirty.objects[new_object_index].planet_coord_id);
-                        } else if(event_scope === 'ship') {
-                            await game_object.place(false, dirty, { 'object_index': new_object_index,
-                                'ship_coord_index': linker_coord_index });
-
-                            //console.log("Object's ship_coord_id: " + dirty.objects[new_object_index].ship_coord_id);
-                        } else if(event_scope === 'galaxy') {
-                            await game_object.place(false, dirty, { 'object_index': new_object_index,
-                                'coord_index': linker_coord_index });
-
-                            //console.log("Object's coord_id: " + dirty.objects[new_object_index].coord_id);
+                        if(new_object_index === -1) {
+                            log(chalk.yellow("Failed to insert object type in event.spawn"));
+                            return false;
                         }
-                    } else {
-
+    
+                        let new_object_id = dirty.objects[new_object_index].id;
+                        
+    
+                        if(new_object_index === -1) {
+                            log(chalk.yellow("Was unable to get object index from object id: " + new_object_id + " in event.spawn"));
+                            return false;
+                        }
+    
                         if(debug_event_ids.indexOf(dirty.events[event_index].id) !== -1) {
-                            console.log("Skipped adding this linker to a coordinate. spawns_off_grid is true");
+                            console.log("Created new object id: " + dirty.objects[new_object_index].id +
+                                " with spawned_event_id: " + dirty.objects[new_object_index].spawned_event_id);
                         }
-                        
+    
+                        if(debug_event_ids.indexOf(dirty.events[event_index].id) !== -1) {
+                            console.log("Linker spawns_off_grid is: " + event_linker.spawns_off_grid);
+                        }
+    
+                        if(helper.isFalse(event_linker.spawns_off_grid)) {
+                            
+                            if(event_scope === 'planet') {
+                                await game_object.place(false, dirty, { 'object_index': new_object_index,
+                                    'planet_coord_index': linker_coord_index });
+    
+                                //console.log("Object's planet_coord_id: " + dirty.objects[new_object_index].planet_coord_id);
+                            } else if(event_scope === 'ship') {
+                                await game_object.place(false, dirty, { 'object_index': new_object_index,
+                                    'ship_coord_index': linker_coord_index });
+    
+                                //console.log("Object's ship_coord_id: " + dirty.objects[new_object_index].ship_coord_id);
+                            } else if(event_scope === 'galaxy') {
+                                await game_object.place(false, dirty, { 'object_index': new_object_index,
+                                    'coord_index': linker_coord_index });
+    
+                                //console.log("Object's coord_id: " + dirty.objects[new_object_index].coord_id);
+                            }
+                        } else {
+    
+                            if(debug_event_ids.indexOf(dirty.events[event_index].id) !== -1) {
+                                console.log("Skipped adding this linker to a coordinate. spawns_off_grid is true");
+                            }
+                            
+                        }
+                    } 
+                    // Object type is not assembled as an object - we can just update the coord with the object type
+                    else {
+
+                        if(event_scope === 'planet') {
+                            main.updateCoordGeneric({}, { 'planet_coord_index': linker_coord_index, 'object_type_id': event_linker.object_type_id, 'amount': 1,
+                                'spawned_event_id': spawned_event_id });
+                        } else if(event_scope === 'ship') {
+                            main.updateCoordGeneric({}, { 'ship_coord_index': linker_coord_index, 'object_type_id': event_linker.object_type_id, 'amount': 1,
+                                'spawned_event_id': spawned_event_id });
+                        } else if(event_scope === 'galaxy') {
+                            main.updateCoordGeneric({}, { 'coord_index': linker_coord_index, 'object_type_id': event_linker.object_type_id, 'amount': 1,
+                                'spawned_event_id': spawned_event_id });
+                        }
+
                     }
+
+                    
 
                     
 

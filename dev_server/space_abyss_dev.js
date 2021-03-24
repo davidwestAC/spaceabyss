@@ -108,7 +108,7 @@ var pool = database.pool;
  @property {number} defending_skill_points
  @property {number} electric_skill_points
  @property {number} explosion_skill_points
- @property {number} freeze_skill_points
+ @property {number} freezing_skill_points
  @property {number} hacking_skill_points
  @property {number} heat_skill_points
  @property {number} gravity_skill_points
@@ -4007,6 +4007,7 @@ module.exports.shuffle = shuffle;
  * @param {number=} data.object_id
  * @param {number=} data.object_type_id
  * @param {number=} data.amount
+ * @param {number=} data.spawned_event_id
  * @returns {Promise<boolean>}
  */
 async function updateCoordGeneric(socket, data) {
@@ -4242,6 +4243,20 @@ async function updateCoordGeneric(socket, data) {
             }
         }
 
+        if(typeof data.spawned_event_id !== 'undefined') {
+
+            //console.log("Have data.monster_id: " + data.monster_id);
+            if(data.spawned_event_id === false) {
+                //console.log("Setting planet coord id: " + dirty.planet_coords[data.planet_coord_index].id + " to monster_id: false");
+                coord.spawned_event_id = false;
+                coord.has_change = true;
+            } else {
+                //console.log("Setting planet coord id: " + dirty.planet_coords[planet_coord_index].id + " to monster_id: " + data.monster_id);
+                coord.spawned_event_id = parseInt(data.spawned_event_id);
+                coord.has_change = true;
+            }
+        }
+
         if(typeof data.watched_by_object_id !== 'undefined') {
             if(data.watched_by_object_id === false) {
                 coord.watched_by_object_id = false;
@@ -4301,9 +4316,9 @@ async function writeDirty(show_output = false) {
         if(coord.has_change) {
             //onsole.log("Coord has a change (floor_type_id, player_id, id) (" + coord.floor_type_id + ", " +  coord.player_id + "," + coord.id + ")");
             let sql = "UPDATE coords SET belongs_to_object_id = ?, belongs_to_planet_id = ?, floor_type_id = ?, " +
-                "npc_id = ?, object_amount = ?, object_id = ?, object_type_id = ?, planet_id = ?, player_id = ?, watched_by_object_id = ? WHERE id = ?";
+                "npc_id = ?, object_amount = ?, object_id = ?, object_type_id = ?, planet_id = ?, player_id = ?, spawned_event_id = ?, watched_by_object_id = ? WHERE id = ?";
             let inserts = [coord.belongs_to_object_id, coord.belongs_to_planet_id, coord.floor_type_id, coord.npc_id,
-                coord.object_amount, coord.object_id, coord.object_type_id, coord.planet_id, coord.player_id, coord.watched_by_object_id, coord.id];
+                coord.object_amount, coord.object_id, coord.object_type_id, coord.planet_id, coord.player_id, coord.spawned_event_id, coord.watched_by_object_id, coord.id];
             pool.query(sql, inserts, function(err, result) {
                 if(err) throw err;
             });
@@ -4467,9 +4482,9 @@ async function writeDirty(show_output = false) {
         if(planet_coord.has_change) {
             //console.log("Planet coord id: " + planet_coord.id + " has a change. object type id: " + planet_coord.object_type_id);
             let sql = "UPDATE planet_coords SET area_id = ?, belongs_to_monster_id = ?, belongs_to_object_id = ?, floor_type_id = ?, npc_id = ?, player_id = ?, monster_id = ?, object_amount = ?, object_id = ?, " +
-                "object_type_id = ?, spawned_monster_id = ?, spawns_monster_type_id = ?, structure_id = ? WHERE id = ?";
+                "object_type_id = ?, spawned_event_id = ?, spawned_monster_id = ?, spawns_monster_type_id = ?, structure_id = ? WHERE id = ?";
             let inserts = [planet_coord.area_id, planet_coord.belongs_to_monster_id, planet_coord.belongs_to_object_id, planet_coord.floor_type_id, planet_coord.npc_id, planet_coord.player_id, planet_coord.monster_id, planet_coord.object_amount, planet_coord.object_id,
-                planet_coord.object_type_id, planet_coord.spawned_monster_id, planet_coord.spawns_monster_type_id, planet_coord.structure_id, planet_coord.id];
+                planet_coord.object_type_id, planet_coord.spawned_event_id, planet_coord.spawned_monster_id, planet_coord.spawns_monster_type_id, planet_coord.structure_id, planet_coord.id];
 
             pool.query(sql, inserts, function(err, result) {
                 if(err) throw err;
@@ -4529,9 +4544,9 @@ async function writeDirty(show_output = false) {
         if(ship_coord.has_change) {
             //console.log("Ship coord has a change");
             let sql = "UPDATE ship_coords SET area_id = ?, belongs_to_monster_id = ?, belongs_to_object_id = ?, floor_type_id = ?, " +
-                "is_damaged = ?, monster_id = ?, object_amount = ?, object_id = ?, object_type_id = ?, player_id = ?, structure_id = ?, spawned_monster_id = ? WHERE id = ?";
+                "is_damaged = ?, monster_id = ?, object_amount = ?, object_id = ?, object_type_id = ?, player_id = ?, structure_id = ?, spawned_event_id = ?, spawned_monster_id = ? WHERE id = ?";
             let inserts = [ship_coord.area_id, ship_coord.belongs_to_monster_id, ship_coord.belongs_to_objct_id, ship_coord.floor_type_id,
-                ship_coord.is_damaged, ship_coord.monster_id, ship_coord.object_amount, ship_coord.object_id, ship_coord.object_type_id, ship_coord.player_id, ship_coord.structure_id, ship_coord.spawned_monster_id,
+                ship_coord.is_damaged, ship_coord.monster_id, ship_coord.object_amount, ship_coord.object_id, ship_coord.object_type_id, ship_coord.player_id, ship_coord.structure_id, ship_coord.spawned_event_id, ship_coord.spawned_monster_id,
                 ship_coord.id];
 
             pool.query(sql, inserts, function(err, result) {
@@ -4584,7 +4599,7 @@ async function writePlayerDirty(writing_player, i, show_output = false) {
 
         let sql = "UPDATE players SET body_id = ?, coord_id = ?, control_skill_points = ?, cooking_skill_points = ?, " +
             "corrosive_skill_points = ?, current_hp = ?, defense = ?, defending_skill_points = ?, electric_skill_points = ?, energy = ?, exp = ?, " +
-            "explosion_skill_points = ?, faction_id = ?, farming_skill_points = ?,  freeze_skill_points = ?, hacking_skill_points = ?, " +
+            "explosion_skill_points = ?, faction_id = ?, farming_skill_points = ?,  freezing_skill_points = ?, hacking_skill_points = ?, " +
             "heat_skill_points = ?, gravity_skill_points = ?, laser_skill_points = ?, last_login = ?, level = ?, max_hp = ?, " +
             "manufacturing_skill_points = ?, melee_skill_points = ?, mining_skill_points = ?, " +
             "piercing_skill_points = ?, planet_coord_id = ?, planet_id = ?, " +
@@ -4594,7 +4609,7 @@ async function writePlayerDirty(writing_player, i, show_output = false) {
             "skin_object_type_id = ?, surgery_skill_points = ? WHERE id = ?";
         let inserts = [writing_player.body_id, writing_player.coord_id, writing_player.control_skill_points, writing_player.cooking_skill_points,
             writing_player.corrosive_skill_points, writing_player.current_hp, writing_player.defense, writing_player.defending_skill_points, writing_player.electric_skill_points, writing_player.energy, writing_player.exp,
-            writing_player.explosion_skill_points, writing_player.faction_id, writing_player.farming_skill_points, writing_player.freeze_skill_points, writing_player.hacking_skill_points,
+            writing_player.explosion_skill_points, writing_player.faction_id, writing_player.farming_skill_points, writing_player.freezing_skill_points, writing_player.hacking_skill_points,
             writing_player.heat_skill_points, writing_player.gravity_skill_points, writing_player.laser_skill_points, writing_player.last_login, writing_player.level, writing_player.max_hp,
             writing_player.manufacturing_skill_points, writing_player.melee_skill_points, writing_player.mining_skill_points,
             writing_player.piercing_skill_points, writing_player.planet_coord_id, writing_player.planet_id,

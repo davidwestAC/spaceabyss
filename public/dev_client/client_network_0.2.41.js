@@ -1882,7 +1882,30 @@ socket.on('object_info', function(data) {
 
         if(object_index !== -1) {
 
+
             let object_type_index = object_types.findIndex(function(obj) { return obj && obj.id === objects[object_index].object_type_id; });
+
+
+            // If the object type has any above display linkers, we should remove that layer
+            let above_display_linkers = object_type_display_linkers.filter(linker =>
+                linker.object_type_id === object_types[object_type_index].id && linker.layer === 'layer_above');
+
+            if(above_display_linkers.length > 0) {
+
+                let object_info = getObjectInfo(object_index);
+
+
+                for(let i = 0; i < above_display_linkers.length; i++) {
+            
+                    let tile_x = object_info.coord.tile_x + above_display_linkers[i].position_x;
+                    let tile_y = object_info.coord.tile_y + above_display_linkers[i].position_y;
+
+                    map.putTileAt(-1, tile_x, tile_y, false, 'layer_above');
+                    
+                   
+                }
+            }
+
             let update_ship_management_display = false;
             if(object_types[object_type_index].is_ship && objects[object_index].player_id === client_player_id) {
                 console.log("Got remove data for a ship that was ours - it was destroyed and we should update our ship management display");
@@ -2887,7 +2910,7 @@ socket.on('player_info', function(data) {
         players[player_index].electric_skill_points = data.player.electric_skill_points;
         players[player_index].explosion_skill_points = data.player.explosion_skill_points;
         players[player_index].farming_skill_points = data.player.farming_skill_points;
-        players[player_index].freeze_skill_points = data.player.freeze_skill_points;
+        players[player_index].freezing_skill_points = data.player.freezing_skill_points;
         players[player_index].hacking_skill_points = data.player.hacking_skill_points;
         players[player_index].heat_skill_points = data.player.heat_skill_points;
         players[player_index].gravity_skill_points = data.player.gravity_skill_points;

@@ -1412,13 +1412,16 @@ const world = require('./world.js');
 
     // Combining the stuff from inventory.place, and game.convertInput
     // Converts X into Y!
-    //  data:   converter_object_id   |   input_type (hp, inventory_item, object_type)   |   input_object_type_id   |   npc_index   |   input_paid (if it's an event or something paying for the conversion input)
     /**
      *
-     * @param socket
-     * @param dirty
+     * @param {Object} socket
+     * @param {Object} dirty
      * @param {Object} data
      * @param {number} data.converter_object_id
+     * @param {string} data.input_type
+     * @param {number} data.input_object_type_id
+     * @param {number=} data.npc_index
+     * @param {boolean=} data.input_paid - In the case of an event, or another game mechanic pre-paying or skipping payment
      * @returns {Promise<boolean>}
      */
     async function convert(socket, dirty, data) {
@@ -2725,7 +2728,7 @@ exports.eat = eat;
                     return false;
                 }
 
-                console.log("Ship coord id: " + dirty.ship_coords[coord_index].id + " is_weapon_hardpoint: " + dirty.ship_coords[coord_index].is_weapon_hardpoint);
+                //console.log("Ship coord id: " + dirty.ship_coords[coord_index].id + " is_weapon_hardpoint: " + dirty.ship_coords[coord_index].is_weapon_hardpoint);
 
                 temp_coord = dirty.ship_coords[coord_index];
                 scope = 'ship';
@@ -5563,7 +5566,7 @@ exports.eat = eat;
                         return false;
                     }
 
-                    await event.spawn(dirty, event_index, { 'coord_index': coord_index });
+                    await event.spawn(dirty, event_index, { 'coord_index': coord_index, 'force': true });
                 } else if(coord_type === 'ship') {
                     let ship_coord_index = await main.getShipCoordIndex({ 'ship_coord_id': coord_id });
 
@@ -6839,11 +6842,13 @@ exports.eat = eat;
                             socket.emit('result_info', { 'status': 'failure',
                             'text': "Your beam mangled up something advanced",
                             'object_id': dirty.objects[object_index].id });
+                            socket.emit('chat', { 'message': 'Your beam mangled up something advanced', 'scope': 'system' });
                         } else {
                             socket.emit('result_info', { 'status': 'failure',
                             'text': "Your beam mangled up something advanced",
                             'coord_id': dirty.active_salvagings[i].coord_id,
                             'coord_type': dirty.active_salvagings[i].coord_type });
+                            socket.emit('chat', { 'message': 'Your beam mangled up something advanced', 'scope': 'system' });
                         }
                         
 
@@ -6896,11 +6901,13 @@ exports.eat = eat;
                             }
 
 
-                        } else {
+                        } 
+                        // We've salvaged an object type
+                        else {
 
                             if(salvaging_room === 'galaxy') {
                                 let placed_on_ship_result = await placeOnShip(socket, dirty, dirty.object_types[salvaged_object_type_index].id, chosen_salvage_linker.amount);
-                                console.log("placed_on_ship_result: " + placed_on_ship_result);
+
                                 if(placed_on_ship_result === false) {
                                     io.to(dirty.active_salvagings[i].player_socket_id).emit('salvaging_linker_info', {
                                         'remove': true, 'salvaging_linker': dirty.active_salvagings[i]
@@ -6944,7 +6951,6 @@ exports.eat = eat;
                 }
 
                 // Reduce the object's hp by ten
-
                 if(object_index !== -1) {
                     dirty.objects[object_index].current_hp -= 10;
                     dirty.objects[object_index].has_change = true;
@@ -6968,10 +6974,13 @@ exports.eat = eat;
                         await game_object.sendInfo(false, object_info.room, dirty, object_index);
 
                     }
-                } else {
+                } 
+                // Or decrement the object type by 1
+                else {
 
 
                     let coord_update_data = {};
+                    let check_spawned_event_id = 0;
                     if(dirty.active_salvagings[i].coord_type === 'galaxy') {
                        coord_update_data.coord_index = dirty.active_salvagings[i].coord_index;
                     } else if(dirty.active_salvagings[i].coord_type === 'planet') {
@@ -6980,15 +6989,27 @@ exports.eat = eat;
                         coord_update_data.ship_coord_index = dirty.active_salvagings[i].coord_index;
                     }
 
+
                     let new_object_type_amount = salvaging_coord.object_amount - 1;
                     if(new_object_type_amount <= 0) {
                         coord_update_data.object_type_id = false;
+
+                        if(salvaging_coord.spawned_event_id) {
+                            check_spawned_event_id = salvaging_coord.spawned_event_id;
+                            coord_update_data.spawned_event_id = false;
+                        }
                     } else {
                         coord_update_data.object_type_id = salvaging_coord.object_type_id;
                         coord_update_data.amount = new_object_type_amount;
                     }
 
-                    main.updateCoordGeneric(socket, coord_update_data);
+                    
+
+                    await main.updateCoordGeneric(socket, coord_update_data);
+
+                    if(check_spawned_event_id !== 0) {
+                        event.checkSpawnedEvent(dirty, check_spawned_event_id);
+                    }
 
                     if(new_object_type_amount <= 0) {
                         world.sendActiveSalvaging(socket, false, dirty, i, true);
@@ -7031,7 +7052,7 @@ exports.eat = eat;
 
 
             if(typeof data.object_id !== 'undefined') {
-                console.log("Was sent in object id: " + data.object_id);
+                //console.log("Was sent in object id: " + data.object_id);
                 let object_index = await game_object.getIndex(dirty, parseInt(data.object_id));
 
                 if(object_index === -1) {
@@ -9465,8 +9486,6 @@ exports.eat = eat;
     exports.tickTraps = tickTraps;
 
 
-
-    // data:    object_id   |   monster_id   |   planet_coord_id   |   ship_coord_id
     /**
      * @param {Object} socket
      * @param {Object} dirty
@@ -9483,8 +9502,8 @@ exports.eat = eat;
 
             let debug_object_type_ids = [];
 
-            log(chalk.green("Got pick up request"));
-            console.log(data);
+            //log(chalk.green("Got pick up request"));
+            //console.log(data);
 
 
             if(typeof socket.player_index === "undefined" || socket.player_index === -1) {
@@ -9550,6 +9569,7 @@ exports.eat = eat;
             let player_info = await player.getCoordAndRoom(dirty, socket.player_index);
 
 
+
             // and lets get the coord of the thing we are picking up ( object or object type )
             let picking_up_coord_index = -1;
             if(object_index !== -1) {
@@ -9588,7 +9608,7 @@ exports.eat = eat;
                     data.ship_coord_id = parseInt(data.ship_coord_id);
                     picking_up_coord_index = await main.getShipCoordIndex({ 'ship_coord_id': data.ship_coord_id });
                 } else if(typeof data.coord_id !== 'undefined') {
-                    scope = 'ship';
+                    scope = 'galaxy';
                     data.coord_id = parseInt(data.coord_id);
                     picking_up_coord_index = await main.getCoordIndex({ 'coord_id': data.coord_id });
                 }
@@ -9606,8 +9626,10 @@ exports.eat = eat;
             if(scope === "planet") {
                 can_interact = await canInteract(socket, dirty, player_info.scope, dirty.planet_coords[picking_up_coord_index]);
             } else if(scope === "ship") {
+                console.log("Checking in ship");
                 can_interact = await canInteract(socket, dirty, player_info.scope, dirty.ship_coords[picking_up_coord_index]);
             } else if(scope === "galaxy") {
+                console.log("Checking in galaxy. player_info.scope: " + player_info.scope);
                 can_interact = await canInteract(socket, dirty, player_info.scope, dirty.coords[picking_up_coord_index]);
             }
 
@@ -9815,16 +9837,42 @@ exports.eat = eat;
             /******************** JUST PICKING UP AN OBJECT TYPE ***************/
 
             let amount = 0;
+            let update_coord_data = { 'object_type_id': false };
+            let check_spawned_event_id = 0;
             if(player_info.scope === 'planet') {
 
                 object_type_index = main.getObjectTypeIndex(dirty.planet_coords[picking_up_coord_index].object_type_id);
                 amount = dirty.planet_coords[picking_up_coord_index].object_amount;
+                update_coord_data.planet_coord_index = picking_up_coord_index;
+
+                if(dirty.planet_coords[picking_up_coord_index].spawned_event_id) {
+                    check_spawned_event_id = dirty.planet_coords[picking_up_coord_index].spawned_event_id;
+                    update_coord_data.spawned_event_id = false;
+
+                }
 
                 
             } else if(player_info.scope === 'ship') {
                 object_type_index = main.getObjectTypeIndex(dirty.ship_coords[picking_up_coord_index].object_type_id);
                 amount = dirty.ship_coords[picking_up_coord_index].object_amount;
+                update_coord_data.ship_coord_index = picking_up_coord_index;
 
+                if(dirty.ship_coords[picking_up_coord_index].spawned_event_id) {
+                    check_spawned_event_id = dirty.ship_coords[picking_up_coord_index].spawned_event_id;
+                    update_coord_data.spawned_event_id = false;
+
+                }
+
+            } else if(player_info.scope === 'galaxy') {
+                object_type_index = main.getObjectTypeIndex(dirty.coords[picking_up_coord_index].object_type_id);
+                amount = dirty.coords[picking_up_coord_index].object_amount;
+                update_coord_data.coord_index = picking_up_coord_index;
+
+                if(dirty.coords[picking_up_coord_index].spawned_event_id) {
+                    check_spawned_event_id = dirty.coords[picking_up_coord_index].spawned_event_id;
+                    update_coord_data.spawned_event_id = false;
+
+                }
             }
 
             if(object_type_index === -1 ){
@@ -9844,13 +9892,12 @@ exports.eat = eat;
 
             inventory.addToInventory(socket, dirty, adding_to_data);
 
-            if(player_info.scope === 'planet') {
-                await main.updateCoordGeneric(socket, { 'planet_coord_index': picking_up_coord_index, 'object_type_id': false });
-            } else if(player_info.scope === 'ship') {
-                await main.updateCoordGeneric(socket, { 'ship_coord_index': picking_up_coord_index, 'object_type_id': false });
+
+            await main.updateCoordGeneric(socket, update_coord_data);
+
+            if(check_spawned_event_id !== 0) {
+                event.checkSpawnedEvent(dirty, check_spawned_event_id);
             }
-
-
 
         } catch(error) {
             log(chalk.red("Error in game.pickUp: " + error));

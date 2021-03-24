@@ -1541,8 +1541,13 @@ async function getLevel(dirty, data) {
             level = 1 + Math.floor(global.level_modifier * Math.sqrt(dirty.players[data.player_index].explosion_skill_points));
         } else if (data.skill_type === 'farming') {
             level = 1 + Math.floor(global.difficult_level_modifier * Math.sqrt(dirty.players[data.player_index].farming_skill_points));
-        } else if (data.skill_type === 'freeze') {
-            level = 1 + Math.floor(global.level_modifier * Math.sqrt(dirty.players[data.player_index].freeze_skill_points));
+
+            if (body_type_index !== -1 && dirty.object_types[body_type_index].farming_modifier) {
+                level += dirty.object_types[body_type_index].farming_modifier;
+                console.log("Body type added: " + dirty.object_types[body_type_index].farming_modifier + " to farming level");
+            }
+        } else if (data.skill_type === 'freezing') {
+            level = 1 + Math.floor(global.level_modifier * Math.sqrt(dirty.players[data.player_index].freezing_skill_points));
         } else if (data.skill_type === 'hacking') {
             level = 1 + Math.floor(global.level_modifier * Math.sqrt(dirty.players[data.player_index].hacking_skill_points));
         }

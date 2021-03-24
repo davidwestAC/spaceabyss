@@ -11,7 +11,7 @@ Addiction levels: none, slight, moderate, heavy
 Each tier upgrade of an item should lose 10% of total HP
 Each tier has the potential for 2 HP, 1 attack, or 1 defense. every 5% increase in addiction chance gives an additional tier level
 
-Total value is if every point was in HP
+Total value is:
     We can quickly calculate this as TIER * 2 * TICK COUNT 
 NORMAL (no bonuses) RARE (1 tier bonus) EPIC (2 tier bonus) LEGENDARY (3 tier bonus)
 
@@ -88,9 +88,9 @@ Battery:    HP: 1 TICKS: 20 TOTAL VALUE: 20 (MLM)       FOCUS: HP
                     Complexity: 26-32
                     Blue Juice: !RARE! HP: 6 Attack: 2 Defense: 2 ADDICTION: 5% TICKS: 90 TOTAL VALUE: 900 (HUMAN) (2.8 effect, cost 3 blue algae, ~.93% efficiency)
 
-                    Gaian Plasma HP: 6 Attack: 1 Defense: 2 ADDICTION: 5% TICKS: 60 TOTAL VALUE: 600 (VUEG|SLERM)
+                    Gaian Plasma HP: 6 Attack: 1 Defense: 2 ADDICTION: 5% TICKS: 60 TOTAL VALUE: 1200 (VUEG|SLERM)
 
-                    Purple Algae !EPIC! (Human)
+                    Purple Algae !EPIC! (Human) HP 8 Attack: 2 Defense: 1 TICKS: 60 TOTAL VALUE: 1680 (HUMAN)
 
 
                         **********************************************************
@@ -99,7 +99,7 @@ Battery:    HP: 1 TICKS: 20 TOTAL VALUE: 20 (MLM)       FOCUS: HP
 
                         Diamond Battery HP: 10 Attack: 1 Defense: 1 Addiction: 5% TICKS: 60 TOTAL VALUE: 720 (MLM)
 
-                        Purple Juice !EPIC! TICKS 60 (Human) 
+                        Purple Juice !EPIC! HP 8 Attack: 3 Defense: 1 TICKS: 480 TOTAL VALUE: 3840 (HUMAN) ( ? effect, cost 10 purple algae, ~.91% efficiency)
 
                         Gaian Concentrate (Human) - Research Gaian Plasma
                         
@@ -122,7 +122,7 @@ Battery:    HP: 1 TICKS: 20 TOTAL VALUE: 20 (MLM)       FOCUS: HP
                                 Defense (player armor): 8
                                 Armor Types: Researching: 80/80
                                 
-
+                                    ************************************************************
                                     TIER 9 Hypercrystal, Crystal Battery
                                     Minimum Monster Damage: 140
                                     Complexity: 60-64
@@ -130,6 +130,11 @@ Battery:    HP: 1 TICKS: 20 TOTAL VALUE: 20 (MLM)       FOCUS: HP
                                     Defense (player armor): 9
                                     Armor Types: Hypercrystal, Researching: 90/90
 
+
+                                        I THINK I NEED MORE TIERS HERE :) :) :)
+
+
+                                        ************************************************************
                                         TIER 10 - Crystadmantium (Crystonium), Antimatter, Quantum Battery 
                                         Minimum Monster Damage: 200
                                         Complexity: 100+
