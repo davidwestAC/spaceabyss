@@ -11,24 +11,19 @@ DOING NOW:
     Whenever I see a getPlanetCoordIndex, getShipCoordIndex, getCoordIndex, see if it's on a monster,object, or player, and switch it to TYPE.getCoordIndex()
 
 
-    Freeze skill not increasing with the icer pistol
-
     Poison seems to not update at all, neither damaging you nor disappearing
     The shift key (I wish for a permanent keep-open button) does not keep the windows open when putting an item into the container, it also lags one action behind.
 
 
     I wouldn't hate players being able to drive through and explode salvagable stuff
 
+    Poison not going away
 
 
     Galaxy coords that players moved through are weird
 
     Cadian's ship got left in the galaxy. 
         I think maybe this happens when you know it's in the galaxy, and they log off while you are off screen? Or different room? (in ship view?)
-
-
-    Poison not going away
-
 
 
     Add in trash asteroid
@@ -69,7 +64,6 @@ same with "https://space.alphacoders.com/melee.mp3"
     Get some Sokolh for the Asteroid City
 
 
-    Notify me when a player logs in?
 
     
 

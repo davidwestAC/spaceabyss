@@ -7061,14 +7061,14 @@ exports.eat = eat;
                 }
     
     
-                let object_type_index = dirty.object_types.findIndex(function(obj) { return obj &&
+                let being_salvaged_object_type_index = dirty.object_types.findIndex(function(obj) { return obj &&
                     obj.id === dirty.objects[object_index].object_type_id; });
     
-                if(object_type_index === -1) {
+                if(being_salvaged_object_type_index === -1) {
                     return false;
                 }
     
-                if(!dirty.object_types[object_type_index].can_be_salvaged) {
+                if(!dirty.object_types[being_salvaged_object_type_index].can_be_salvaged) {
                     log(chalk.yellow("Player is trying to salvage something that is not salvagable"));
                     socket.emit('chat', { 'message': "That cannot be salvaged", 'scope': 'system' });
                     return false;
@@ -7112,6 +7112,42 @@ exports.eat = eat;
     
     
                 world.sendActiveSalvaging(socket, false, dirty, salvaging_index);
+
+
+                // If the object type has an attack, it's going to attack back! (Things like Prison Ship)
+                if(helper.notFalse(dirty.object_types[being_salvaged_object_type_index].attack_strength)) {
+                     // Make sure the monster isn't already attacking something
+                     let existing_battle_linker_index = dirty.battle_linkers.findIndex(function(obj) { return obj &&
+                        obj.attacking_id === dirty.objects[object_index].id && obj.attacking_type === 'object'; });
+
+                    if(existing_battle_linker_index === -1) {
+
+                        let player_info = await player.getCoordAndRoom(dirty, socket.player_index);
+
+                        let battle_linker_data = {
+                            'id': uuidv1(),
+                            'attacking_id': dirty.objects[object_index].id, 'attacking_type': 'object', 
+                            'room': player_info.room,
+                            'being_attacked_sock_id': socket.id,
+                            'turn_count': 0
+                        };
+
+                        if(player_info.room === 'galaxy') {
+                            battle_linker_data.being_attacked_type = 'object';
+                            battle_linker_data.being_attacked_id = dirty.players[socket.player_index].ship_id;
+                        } else {
+                            battle_linker_data.being_attacked_type = 'player';
+                            battle_linker_data.being_attacked_id = dirty.players[socket.player_index].id;
+                        }
+
+                        let new_battle_linker_index = dirty.battle_linkers.push(battle_linker_data) - 1;
+                        
+                        socket.emit('battle_linker_info', { 'battle_linker': dirty.battle_linkers[new_battle_linker_index] });
+                        
+                    }
+                }
+
+
             } 
             // Salvaging based on a coord
             else if(typeof data.coord_id !== 'undefined') {

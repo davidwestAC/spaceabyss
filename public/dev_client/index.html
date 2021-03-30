@@ -35,7 +35,26 @@
 <script src="https://space.alphacoders.com:8010/socket.io/socket.io.js"></script>
 
 <script type="text/javascript">
+    var connected = false;
     var socket = false;
+
+    //phase.io might need some extra time to load its stuff
+    //the connected var is in most cases set to true once all data has been received
+    async function login(username, email, password) {
+        let timeout = 5000;
+        let sleep = 20;
+        while (!connected && timeout > 0) {
+            timeout -= sleep;
+            await (new Promise(resolve => setTimeout(resolve, sleep)));
+        }
+
+        //no login if the client has not connected yet
+        if (connected) {
+            socket.emit('login_data', {player_name: username, email: email, password: password});
+        }
+    }
+
+
     if(io) {
         socket = io.connect('space.alphacoders.com:8010', { secure: true });
 
@@ -64,13 +83,13 @@
       
     
 
-    <script src="client_functions_0.2.41.js"></script>
-    <script src="client_network_0.2.41.js"></script>
-    <script src="client_click_0.2.41.js"></script>
-    <script src="effects_0.2.41.js"></script>
-    <script src="monster_0.2.41.js"></script>
-    <script src="planet_0.2.41.js"></script>
-    <script src="player_0.2.41.js"></script>
+    <script src="client_functions.js"></script>
+    <script src="client_network.js"></script>
+    <script src="client_click.js"></script>
+    <script src="effects.js"></script>
+    <script src="monster.js"></script>
+    <script src="planet.js"></script>
+    <script src="player.js"></script>
 
 
     <link href="//space.alphacoders.com/bulma-0.7.2/css/bulma.min.css" rel="stylesheet" media="screen">
@@ -326,16 +345,31 @@
         <!-- Our line of buttons! -->
         <script type="text/javascript">
 
+            function setButton(button, enabled) {
+                let b = document.getElementById("button_" + button);
+                if (b) {
+                    let style = b.style;
+                    if (enabled) {
+                        style.backgroundColor = "#85d1a0"
+                    } else {
+                        style.backgroundColor = "#ffffff"
+                        style.borderColor = "#dbdbdb"
+                    }
+                }
+            }
+
             function toggleAssembleDisplay() {
 
 
-                if($("#can_assemble_list").is(":visible")) {
-                    $("#can_assemble_list").hide();
-                    $("#can_assemble_list").empty();
+                if(sel_can_assemble_list.is(":visible")) {
+                    sel_can_assemble_list.hide();
+                    sel_can_assemble_list.empty();
+                    setButton("assemble", false);
 
                 } else {
-                    $('#can_assemble_list').show();
+                    sel_can_assemble_list.show();
                     printAssemblyList();
+                    setButton("assemble", true);
                 }
 
             }
@@ -343,41 +377,45 @@
             function toggleFactionDisplay() {
 
 
-                if($("#faction").is(":visible")) {
-                    $("#faction").hide();
-                    $("#faction").empty();
+                if(sel_faction.is(":visible")) {
+                    sel_faction.hide();
+                    sel_faction.empty();
+                    setButton("faction", false);
 
                 } else {
-                    $('#faction').show();
+                    sel_faction.show();
                     generateFactionDisplay();
+                    setButton("faction", true);
                 }
 
             }
 
             function toggleInventoryDisplay() {
 
-
-                if($("#inventory").is(":visible")) {
-                    $("#inventory").hide();
-                    $("#inventory").empty();
+                if(sel_inventory.is(":visible")) {
+                    sel_inventory.hide();
+                    sel_inventory.empty();
+                    setButton("inventory", false);
 
                 } else {
-                    $('#inventory').show();
+                    sel_inventory.show();
                     generateInventoryDisplay();
+                    setButton("inventory", true);
                 }
 
             }
 
             function toggleManagementOptionsDisplay() {
-                if($("#management_options").is(":visible")) {
-                    $("#management_options").hide();
-                    $("#management_options").empty();
-
+                if(sel_management_options.is(":visible")) {
+                    sel_management_options.hide();
+                    sel_management_options.empty();
+                    setButton("management_options", false);
 
                 } else {
-                    $('#management_options').show();
+                    sel_management_options.show();
 
                     generateManagementOptionsDisplay();
+                    setButton("management_options", true);
 
                 }
             }
@@ -385,9 +423,10 @@
             function toggleManagementDisplay(object_index = -1) {
 
 
-                if($("#management").is(":visible")) {
-                    $("#management").hide();
-                    $("#management").empty();
+                if(sel_management.is(":visible")) {
+                    sel_management.hide();
+                    sel_management.empty();
+                    setButton("management", false);
                     
                     //$('#area_management').hide();
                     //$('#area_management').empty();
@@ -396,11 +435,12 @@
                     //$('#ship_management').empty();
 
                 } else {
-                    $('#management').show();
+                    sel_management.show();
                     //$('#area_management').show();
                     //$('#ship_management').show();
 
                     generateNonAiManagementDisplay(object_index);
+                    setButton("management", true);
                     //generateAreaManagementDisplay();
                     //generateShipManagementDisplay();
                 }
@@ -408,42 +448,48 @@
             }
 
             function toggleAiManagementDisplay(object_index = -1) {
-                if($("#ai_management").is(":visible")) {
-                    $("#ai_management").hide();
-                    $("#ai_management").empty();
+                if(sel_ai_management.is(":visible")) {
+                    sel_ai_management.hide();
+                    sel_ai_management.empty();
+                    setButton("ai_management", false);
 
 
                 } else {
-                    $('#ai_management').show();
+                    sel_ai_management.show();
 
                     generateAiManagementDisplay(object_index);
+                    setButton("ai_management", true);
 
                 }
             }
 
             function toggleAreaManagementDisplay() {
-                if($("#area_management").is(":visible")) {
-                    $("#area_management").hide();
-                    $("#area_management").empty();
+                if(sel_area_management.is(":visible")) {
+                    sel_area_management.hide();
+                    sel_area_management.empty();
+                    setButton("area_management", false);
 
 
                 } else {
-                    $('#area_management').show();
+                    sel_area_management.show();
 
                     generateAreaManagementDisplay();
+                    setButton("area_management", true);
 
                 }
             }
 
             function togglePlayerEquipmentDisplay() {
 
-                if($("#player_equipment").is(":visible")) {
-                    $("#player_equipment").hide();
-                    $("#player_equipment").empty();
+                if(sel_player_equipment.is(":visible")) {
+                    sel_player_equipment.hide();
+                    sel_player_equipment.empty();
+                    setButton("equipment", false);
 
                 } else {
-                    $('#player_equipment').show();
+                    sel_player_equipment.show();
                     generateEquipmentDisplay();
+                    setButton("equipment", true);
                 }
 
             }
@@ -452,13 +498,15 @@
 
                 console.log("in togglePlayerInfoDisplay");
 
-                if($("#player_stats").is(":visible")) {
-                    $("#player_stats").hide();
-                    $("#player_stats").empty();
+                if(sel_player_stats.is(":visible")) {
+                    sel_player_stats.hide();
+                    sel_player_stats.empty();
+                    setButton("player_stats", false);
 
                 } else {
-                    $('#player_stats').show();
+                    sel_player_stats.show();
                     generatePlayerInfoDisplay();
+                    setButton("player_stats", true);
                 }
 
             }
@@ -466,13 +514,15 @@
             function toggleRelationshipDisplay() {
 
 
-                if($("#relationships").is(":visible")) {
-                    $("#relationships").hide();
-                    $("#relationships").empty();
+                if(sel_relationships.is(":visible")) {
+                    sel_relationships.hide();
+                    sel_relationships.empty();
+                    setButton("relationships", false);
 
                 } else {
-                    $('#relationships').show();
+                    sel_relationships.show();
                     generateRelationshipDisplay();
+                    setButton("relationships", true);
                 }
 
             }
@@ -480,23 +530,27 @@
             function toggleResearchDisplay() {
 
 
-                if($("#research").is(":visible")) {
-                    $("#research").hide();
-                    $("#research").empty();
-                    $('#discoveries').empty();
+                if(sel_research.is(":visible")) {
+                    sel_research.hide();
+                    sel_research.empty();
+                    sel_discoveries.empty();
+                    setButton("research", false);
 
                 } else {
-                    $('#research').show();
+                    sel_research.show();
                     generateResearchDisplay();
+                    setButton("research", true);
                 }
 
             }
 
             function toggleSettingsDisplay() {
-                if($("#settings").is(":visible")) {
-                    $("#settings").hide();
+                if(sel_settings.is(":visible")) {
+                    sel_settings.hide();
+                    setButton("settings", false);
                 } else {
-                    $('#settings').show();
+                    sel_settings.show();
+                    setButton("settings", true);
                 }
             }
 
@@ -504,41 +558,41 @@
 
 
         <div class="main-button-wrapper" style="margin-bottom:10px;">
-            <a class="button is-default main-button" onclick="toggleInventoryDisplay();">
+            <a id="button_inventory" class="button is-default main-button" onclick="toggleInventoryDisplay();">
                 <i class="fal fa-backpack fa-2x" class="main-icon"></i>
             </a>
 
-            <a class="button is-default main-button" onclick="togglePlayerEquipmentDisplay();">
+            <a id="button_equipment" class="button is-default main-button" onclick="togglePlayerEquipmentDisplay();">
                 <i class="fas fa-helmet-battle fa-2x" class="main-icon"></i>
             </a>
 
-            <a class="button is-default main-button" onclick="togglePlayerInfoDisplay();">
+            <a id="button_player_stats" class="button is-default main-button" onclick="togglePlayerInfoDisplay();">
                 <i class="fas fa-book fa-2x" class="main-icon"></i>
             </a>
 
-            <a class="button is-default main-button" onclick="toggleAssembleDisplay();">
+            <a id="button_assemble" class="button is-default main-button" onclick="toggleAssembleDisplay();">
                 <i class="fas fa-industry-alt fa-2x" class="main-icon"></i>
             </a>
 
-            <a class="button is-default main-button" onclick="toggleResearchDisplay();">
+            <a id="button_research" class="button is-default main-button" onclick="toggleResearchDisplay();">
                 <i class="fad fa-vials fa-2x" class="main-icon"></i>
             </a>
 
             <!--
-            <a class="button is-default main-button" onclick="toggleRelationshipDisplay();">
+            <a id="button_relationships" class="button is-default main-button" onclick="toggleRelationshipDisplay();">
                 <i class="fas fa-heartbeat fa-2x" class="main-icon"></i>
             </a>
             -->
 
-            <a class="button is-default main-button" onclick="toggleManagementOptionsDisplay();">
+            <a id="button_management_options" class="button is-default main-button" onclick="toggleManagementOptionsDisplay();">
                 <i class="fas fa-tasks fa-2x" class="main-icon"></i>
             </a>
 
-            <a class="button is-default main-button" onclick="toggleFactionDisplay();">
+            <a id="button_faction" class="button is-default main-button" onclick="toggleFactionDisplay();">
                 <i class="fad fa-users-crown fa-2x" class="main-icon"></i>
             </a>
 
-            <a class="button is-default main-button" onclick="toggleSettingsDisplay();">
+            <a id="button_settings" class="button is-default main-button" onclick="toggleSettingsDisplay();">
                 <i class="fad fad fa-cogs fa-2x" class="main-icon"></i>
             </a>
 
@@ -553,7 +607,8 @@
             <div id="launch" style="display:inline; margin-top:10px; padding:10px;"></div>
             <div id="fuel" style="display:inline; margin-top:10px; padding:10px;"></div>
 
-            <div id="inventory" style="margin-bottom:10px;"></div>
+            <!-- starts out invisible, and is opened once the player is logged in -->
+            <div id="inventory" style="display:none;margin-bottom:10px;"></div>
 
             <div id="addiction" class="white-text">
 
@@ -695,10 +750,27 @@
 
 <script>
 
+    const sel_can_assemble_list  = $("#can_assemble_list")
+    const sel_faction = $("#faction")
+    const sel_inventory = $("#inventory")
+    const sel_management_options = $("#management_options")
+    const sel_management = $("#management")
+    const sel_area_management = $("#area_management")
+    const sel_ship_management = $("#ship_management")
+    const sel_ai_management = $("#ai_management")
+    const sel_player_equipment = $("#player_equipment")
+    const sel_player_stats = $("#player_stats")
+    const sel_research = $("#research")
+    const sel_settings = $("#settings")
+    const sel_discoveries = $("#discoveries")
+    const sel_relationships = $("#relationships")
+
+    const sel_click_menu = $("#click_menu")
+    const sel_chat_new = $('#chat_new')
+
     var camera;
     var logged_in = false;
-    var connected = false;
-
+    
     var mouse_x;
     var mouse_y;
     var move_delay = 500;
@@ -3338,7 +3410,7 @@
             var local_email = $('#email').val();
             var local_player_name = $('#player_name').val();
             var local_password = $('#password').val();
-            socket.emit('login_data', {player_name: local_player_name, email: local_email, password: local_password });
+            login(local_player_name, local_email, local_password);
             //console.log("Sending login data:" + local_player_name + ", " + local_email);
             event.preventDefault();
             document.getElementById('the_game').focus();

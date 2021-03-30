@@ -1,3 +1,23 @@
+## [0.2.41] - 2021-03-30
+
+
+### Added 
+- Prison Ship
+- If an object type is both salvagable and has an attack strength, it will attack back when its being salvaged.
+- Support for running in http or https based on SSL keys in .env (https://github.com/Luke100000/spaceabyss/commit/9e7f4f8b77f4fb412f73ddafda5437ad098a3bc5)
+- The main display buttons now change color when they are displaying something (this makes it a lot easier to close things ) (https://github.com/Luke100000/spaceabyss/commit/9e7f4f8b77f4fb412f73ddafda5437ad098a3bc5)
+
+### Changed
+- Modified package.json (https://github.com/Luke100000/spaceabyss/commit/9e7f4f8b77f4fb412f73ddafda5437ad098a3bc5)
+- Caching jQuery selectors (https://github.com/Luke100000/spaceabyss/commit/9cd98f32d877467740aa9bcf022c7b0eb5abdc16)
+- Changing the client versioning in github to make things easier on other devs.
+- Removed code that would auto fail on ship id 2 (https://github.com/Luke100000/spaceabyss/commit/4ab299fa3f07c6ac97e2259999a19e3ca4ec2ef3)
+- A few var/let/const changes (https://github.com/Luke100000/spaceabyss/commit/4ab299fa3f07c6ac97e2259999a19e3ca4ec2ef3)
+- Updated Login (https://github.com/Luke100000/spaceabyss/commit/ba8a1c3d1402d762999a192e813d2f30816f579f)
+
+### Fixed
+- Bug with moving up and down levels on ships
+
 ## [0.2.40] - 2021-03-24
 
 

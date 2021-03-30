@@ -24,20 +24,20 @@ sed -i 's/8000/8010/g' /mnt/c/spaceabyss/public/dev_client/index.html
 sed -i 's/phaser-3.15.1.min.js/phaser-3.15.1.js/g' /mnt/c/spaceabyss/public/dev_client/index.html
 
 
-# rename our dev client to the next version
-mv $CLIENT_DEV_DIRECTORY/client_click_${1}.js $CLIENT_DEV_DIRECTORY/client_click_${2}.js
-mv $CLIENT_DEV_DIRECTORY/client_functions_${1}.js $CLIENT_DEV_DIRECTORY/client_functions_${2}.js
-mv $CLIENT_DEV_DIRECTORY/client_network_${1}.js $CLIENT_DEV_DIRECTORY/client_network_${2}.js
-mv $CLIENT_DEV_DIRECTORY/effects_${1}.js $CLIENT_DEV_DIRECTORY/effects_${2}.js
-mv $CLIENT_DEV_DIRECTORY/monster_${1}.js $CLIENT_DEV_DIRECTORY/monster_${2}.js
-mv $CLIENT_DEV_DIRECTORY/planet_${1}.js $CLIENT_DEV_DIRECTORY/planet_${2}.js
-mv $CLIENT_DEV_DIRECTORY/player_${1}.js $CLIENT_DEV_DIRECTORY/player_${2}.js
+# rename our dev client to unversioned files to be nice on github
+mv $CLIENT_DEV_DIRECTORY/client_click_${1}.js $CLIENT_DEV_DIRECTORY/client_click.js
+mv $CLIENT_DEV_DIRECTORY/client_functions_${1}.js $CLIENT_DEV_DIRECTORY/client_functions.js
+mv $CLIENT_DEV_DIRECTORY/client_network_${1}.js $CLIENT_DEV_DIRECTORY/client_network.js
+mv $CLIENT_DEV_DIRECTORY/effects_${1}.js $CLIENT_DEV_DIRECTORY/effects.js
+mv $CLIENT_DEV_DIRECTORY/monster_${1}.js $CLIENT_DEV_DIRECTORY/monster.js
+mv $CLIENT_DEV_DIRECTORY/planet_${1}.js $CLIENT_DEV_DIRECTORY/planet.js
+mv $CLIENT_DEV_DIRECTORY/player_${1}.js $CLIENT_DEV_DIRECTORY/player.js
 
 # Update our index.html file to call the updated files
-sed -i "s/client_functions_${1}/client_functions_${2}/g" $CLIENT_DEV_DIRECTORY/index.html
-sed -i "s/client_network_${1}/client_network_${2}/g" $CLIENT_DEV_DIRECTORY/index.html
-sed -i "s/client_click_${1}/client_click_${2}/g" $CLIENT_DEV_DIRECTORY/index.html
-sed -i "s/effects_${1}/effects_${2}/g" $CLIENT_DEV_DIRECTORY/index.html
-sed -i "s/monster_${1}/monster_${2}/g" $CLIENT_DEV_DIRECTORY/index.html
-sed -i "s/planet_${1}/planet_${2}/g" $CLIENT_DEV_DIRECTORY/index.html
-sed -i "s/player_${1}/player_${2}/g" $CLIENT_DEV_DIRECTORY/index.html
+sed -i "s/client_functions_${1}/client_functions/g" $CLIENT_DEV_DIRECTORY/index.html
+sed -i "s/client_network_${1}/client_network/g" $CLIENT_DEV_DIRECTORY/index.html
+sed -i "s/client_click_${1}/client_click/g" $CLIENT_DEV_DIRECTORY/index.html
+sed -i "s/effects_${1}/effects/g" $CLIENT_DEV_DIRECTORY/index.html
+sed -i "s/monster_${1}/monster/g" $CLIENT_DEV_DIRECTORY/index.html
+sed -i "s/planet_${1}/planet/g" $CLIENT_DEV_DIRECTORY/index.html
+sed -i "s/player_${1}/player/g" $CLIENT_DEV_DIRECTORY/index.html
