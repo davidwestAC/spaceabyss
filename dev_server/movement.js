@@ -373,8 +373,6 @@ async function dockOnShip(socket, dirty, object_id) {
 
     try {
 
-        log(chalk.green("Docking on a dockable ship! (SPACE STATION!?!)"));
-
         let player_index = await player.getIndex(dirty, { 'player_id': socket.player_id });
 
         if(player_index === -1) {
@@ -3843,16 +3841,16 @@ async function payForGalaxyMove(socket, dirty, ship_index) {
                 let warp_to_coord_index = -1;
                 let planet_galaxy_coord_index = await main.getCoordIndex({ 'coord_id': dirty.planets[planet_index].coord_id });
 
-                console.time("getOpenCoordIndex");
+                //console.time("getOpenCoordIndex");
                 let placing_coord_index = await world.getOpenCoordIndex(dirty, 'galaxy', planet_galaxy_coord_index, 'player', player_index, 2);
-                console.timeEnd("getOpenCoordIndex");
+                //console.timeEnd("getOpenCoordIndex");
 
                 if(placing_coord_index !== -1) {
                     warp_to_coord_index = await warpTo(socket, dirty, { 'player_index': player_index, 'warping_to': 'galaxy', 'base_coord_index': placing_coord_index });
                 } else {
-                    console.time("getOpenCoordIndexLonger");
+                    //console.time("getOpenCoordIndexLonger");
                     placing_coord_index = await world.getOpenCoordIndex(dirty, 'galaxy', planet_galaxy_coord_index, 'player', player_index, 4);
-                    console.timeEnd("getOpenCoordIndexLonger");
+                    //console.timeEnd("getOpenCoordIndexLonger");
 
                     if(placing_coord_index !== -1) {
                         warp_to_coord_index = await warpTo(socket, dirty, { 'player_index': player_index, 'warping_to': 'galaxy', 'base_coord_index': placing_coord_index });
@@ -4093,16 +4091,16 @@ async function payForGalaxyMove(socket, dirty, ship_index) {
 
                     let found_galaxy_coord = false;
 
-                    console.time("getOpenCoordIndex");
+                    //console.time("getOpenCoordIndex");
                     let placing_galaxy_coord_index = await world.getOpenCoordIndex(dirty, 'galaxy', ship_galaxy_coord_index, 'player', player_index, 2);
-                    console.timeEnd("getOpenCoordIndex");
+                    //console.timeEnd("getOpenCoordIndex");
     
                     if(placing_galaxy_coord_index !== -1) {
                         found_galaxy_coord = true;
                     } else {
-                        console.time("getOpenCoordIndexLonger");
+                        //console.time("getOpenCoordIndexLonger");
                         placing_galaxy_coord_index = await world.getOpenCoordIndex(dirty, 'galaxy', ship_galaxy_coord_index, 'player', player_index, 4);
-                        console.timeEnd("getOpenCoordIndexLonger");
+                        //console.timeEnd("getOpenCoordIndexLonger");
     
                         if(placing_galaxy_coord_index !== -1) {
                             found_galaxy_coord = true;

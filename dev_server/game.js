@@ -595,8 +595,6 @@ const world = require('./world.js');
 
                 let new_id = result.insertId;
 
-                console.log("Inserted new addiction linker id: " + new_id);
-
                 let [rows, fields] = await (pool.query("SELECT * FROM addiction_linkers WHERE id = ?", [new_id]));
                 if(rows[0]) {
 
@@ -1911,6 +1909,52 @@ const world = require('./world.js');
     }
 
     exports.createArea = createArea;
+
+    /**
+     * @param {Object} socket
+     * @param {Object} dirty
+     * @param {number} body_index
+     */
+    async function createDeadBody(socket, dirty, body_index) {
+
+        console.log("Creating a dead body");
+
+        // We're going to spawn a dead body whether we can place it or not
+        let insert_object_type_data = { 'object_type_id': 151 };
+        let new_object_index = await world.insertObjectType(false, dirty, insert_object_type_data);
+
+        for(let i = 0; i < dirty.equipment_linkers.length; i++) {
+            if(dirty.equipment_linkers[i] && dirty.equipment_linkers[i].body_id === dirty.objects[body_index].id) {
+                await player.unequip(socket, dirty, dirty.equipment_linkers[i].id);
+            }
+        }
+
+
+        // Remove inventory items from this body, and put them in the dead body
+        for(let i = 0; i < dirty.inventory_items.length; i++) {
+            if(dirty.inventory_items[i] && dirty.inventory_items[i].body_id === dirty.objects[body_index].id) {
+
+                // remove the inventory item
+                let remove_data = { 'inventory_item_id': dirty.inventory_items[i].id, 'amount': dirty.inventory_items[i].amount };
+                let add_data = { 'adding_to_type': 'object', 'adding_to_id': dirty.objects[new_object_index].id, 'amount': dirty.inventory_items[i].amount };
+                if(dirty.inventory_items[i].object_id) {
+                    add_data.object_id = dirty.inventory_items[i].object_id;
+                }
+
+                if(dirty.inventory_items[i].object_type_id) {
+                    add_data.object_type_id = dirty.inventory_items[i].object_type_id;
+                }
+                await inventory.removeFromInventory(socket, dirty, remove_data);
+
+                await inventory.addToInventory(socket, dirty, add_data);
+            }
+        }
+
+        return new_object_index;
+
+    }
+
+    exports.createDeadBody = createDeadBody;
 
 
 
@@ -4837,7 +4881,7 @@ exports.eat = eat;
                 return false;
             }
 
-            console.log("Addicted body id: " + dirty.objects[body_index].id + " player id: " + dirty.objects[body_index].player_id);
+            //console.log("Addicted body id: " + dirty.objects[body_index].id + " player id: " + dirty.objects[body_index].player_id);
 
             let body_type_index = main.getObjectTypeIndex(dirty.objects[body_index].object_type_id);
             let player_index = await player.getIndex(dirty, { 'player_id': dirty.objects[body_index].player_id });
@@ -4853,18 +4897,17 @@ exports.eat = eat;
             }
 
 
+            let player_socket = await world.getPlayerSocket(dirty, player_index);
             // If it's the player's body, lets only tick it while they are logged in
             if(dirty.objects[body_index].id === dirty.players[player_index].body_id) {
-                let player_socket = world.getPlayerSocket(dirty, player_index);
                 if(helper.isFalse(player_socket)) {
-                    console.log("This is the player's active body, but they aren't connected. Holding off");
                     return false;
                 }
             }
 
             let race_eating_index = dirty.race_eating_linkers.findIndex(function(obj) { return obj &&
                 obj.race_id === dirty.object_types[body_type_index].race_id && obj.object_type_id === dirty.object_types[addicted_object_type_index].id; });
-            let player_socket = await world.getPlayerSocket(dirty, player_index);
+
 
             if(race_eating_index === -1) {
                 log(chalk.yellow("That body cannot eat that!"));

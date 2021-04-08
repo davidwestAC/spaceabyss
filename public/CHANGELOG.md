@@ -1,3 +1,26 @@
+## [0.2.42] - 2021-04-08
+
+### Added
+- Added Bloomer (monster)
+- Dredge
+- Bubble Eggs
+- Infantry (monster)
+- Servant (monster)
+- Discarded Lancer (monster)
+- Whale City
+
+
+### Changed
+- Updated Asteroid City interior
+- Reduced the spawn rate of Algae Kings and Widden
+- Bodies that die will always drop a 'bag' regardless of whether they are equipped or not
+- Body 'bags' will also belong to the player that owned the body that died. In this case, if a bad doesn't drop, we can track it and get it to the player
+- Updated The Great Nomad Interior
+- Updated Derelict Mining Outpost Interior
+
+### Fixed
+- Improvements for the display of poison, removing the display of poison
+
 ## [0.2.41] - 2021-03-30
 
 

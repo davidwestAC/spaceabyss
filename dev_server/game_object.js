@@ -664,20 +664,32 @@ async function deleteObject(dirty, data) {
             }
         }
 
-        // if it's a body - delete any items that are equipped on it
+        // if it's a body - create a dead body
         if(dirty.object_types[object_type_index].race_id) {
-            await player.getEquipment(dirty, dirty.objects[data.object_index].id);
 
-            for(let equipment_linker of dirty.equipment_linkers) {
-                if(equipment_linker && equipment_linker.body_id === dirty.objects[data.object_index].id) {
-                    let equipped_object_index = await getIndex(dirty, equipment_linker.object_id);
+            let dead_body_index = await game.createDeadBody({}, dirty, data.object_index);
 
-                    await deleteObject(dirty, { 'object_index': equipped_object_index });
-                }
+
+             // If the object was associated with a coord, place the dead body
+             if(object_info.scope === 'galaxy') {
+                await main.updateCoordGeneric(false, { 'coord_index': object_info.coord_index, 'object_id': dirty.objects[dead_body_index].id });
+            } else if(object_info.scope === 'planet') {
+                await main.updateCoordGeneric(false, { 'planet_coord_index': object_info.coord_index, 'object_id': dirty.objects[dead_body_index].id });
+            } else if(object_info.scope === 'ship') {
+                await main.updateCoordGeneric(false, { 'ship_coord_index': object_info.coord_index, 'object_id': dirty.objects[dead_body_index].id });
+                console.log("Updated ship coord to no object_id");
             }
+
 
             // The body belonged to a player, lets let them know that their body died
             if(dirty.objects[data.object_index].player_id) {
+
+                if(dead_body_index !== -1) {
+                    dirty.objects[dead_body_index].player_id === dirty.objects[data.object_index].player_id;
+                    dirty.objects[dead_body_index].has_change = true;
+                }
+                
+
                 let object_player_index = await player.getIndex(dirty, { 'player_id': dirty.objects[data.object_index].player_id });
                 if(object_player_index !== -1) {
 
@@ -707,9 +719,6 @@ async function deleteObject(dirty, data) {
             }
 
         }
-
-        // delete any equipment linkers associated with this object
-        await (pool.query("DELETE FROM equipment_linkers WHERE object_id = ?", [dirty.objects[data.object_index].id]));
 
 
         // delete any rules

@@ -23,8 +23,9 @@ wide:
 
 Something really small, like an egg: 18x18
 
-
-STRUCTURE FOR SENDING AN ITEM
+************************************
+** STRUCTURE FOR SENDING AN ITEM ***
+************************************
 
 MONSTER
 BlueWare: Design
@@ -50,8 +51,57 @@ Current Sprite: None
 *************************************
 
 Living Tree in Space ( I kind of like the idea of a cherry blossom one )
+Type: Portal
+Sprite Status: None
 
 Corrupted Tree in Space (nulroms got it)
+Type: Portal
+Sprite Status: None
+
+
+Battery Acid
+Type: Consumable
+Sprite Status: I've drawn a basic, usable sprite.
+Idea: A way of turning batteries into something else. Focuses on attack
+
+Disctrict Block
+Type: Portal
+Sprite Status: I'm drawing something (awful)
+Reference Image: https://images.gemquery.com/263/content_2636921.jpg
+Content Within:
+    Idea: Lots of varried people and things that live on Corporation planets
+
+Super Conducting Node
+Type: Portal
+Sprite Status: I'm drawing something (bad)
+Reference Image: https://images.gemquery.com/257/content_2578119.jpg
+Content Within:
+    Idea: Lots of energy/battiers/power cells
+
+
+Tentacles
+Type: Monster
+Sprite Status: I've drawn a basic, usable sprite
+
+Bloomer
+Type: Monster
+Sprite Status: None
+
+Dredge
+Type: Machine
+Sprite Status: I've drawn a basic, usable sprite
+
+
+Mechanocytes
+Type: Consumable
+Sprite Status: I've drawn a basic, usable sprite
+Idea: (one of the building blocks of machines? Battery + AI Dust? Defensive)
+
+Battery Manufacturing Facility/Battery District
+Type: Portal
+Sprite Status: None
+Content Within:
+    Batteries in various states of being built. Battery transporter monster. Larger type of battery deposit
 
 
 

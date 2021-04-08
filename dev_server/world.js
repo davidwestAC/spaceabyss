@@ -5441,7 +5441,7 @@ async function tickWaitingDrops(dirty) {
                 //console.timeEnd("gameobject.canPlaceAround");
 
                 //console.time("getOpenCoordIndex");
-                let placing_coord_index = await getOpenCoordIndex(dirty, coord_type, base_coord_index, placing_type, placing_index, 2);
+                let placing_coord_index = await getOpenCoordIndex(dirty, coord_type, base_coord_index, placing_type, placing_index, 3);
                 //console.timeEnd("getOpenCoordIndex");
 
 

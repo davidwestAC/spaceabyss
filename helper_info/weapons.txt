@@ -1,6 +1,6 @@
-*****************************************
+**********************************************************
 ******************** WEAPON TREE *************************
-*****************************************
+**********************************************************
 
 
 PLAYER WEAPONS
@@ -23,6 +23,7 @@ CORROSIVE (combination of damage + addiction (damage over time ))
                         Biochemical Assault Rifle
 
 ELECTRIC
+    Shock Stick
             Energy Blade
 
 
@@ -36,7 +37,9 @@ EXPLOSION
     Corrupted Battery Pack
         Thiol Bomb
             Corrupted Power Cell
-                    Nuke
+                grenade launcher
+                    Knife missiles
+                        Nuke
                             Planet Buster
                                     Stardriller
 
@@ -44,6 +47,9 @@ EXPLOSION
 FREEZING
             Icer Pistol
                     Chiller
+                        Chrysalis gun
+                                Refrigerator later. Shoots a ball of something at someone, then collects the energy/heat 
+                                        around that and shoots off laser away from it
 
 HACKING
     Hacking Knife
@@ -55,18 +61,21 @@ HEAT
         Hull Welder
                 Heat Lance ( inferno core required to make )
 
-                    Flamethrower *RANGE* (inferno cores required as well )
+                    Flamethrower *RANGE* (inferno cores required as well ) ( https://images.gemquery.com/263/content_2638420.jpg )
 
-                            Pyrorifle
+                            Pyrorifle ( https://images.gemquery.com/263/content_2638422.jpg )
 
 
 GRAVITY
-            Graviblaster
+        Gravgun
+            Graviblaster ( https://images.gemquery.com/254/content_2543035.jpg )
                     Microtearer
 
 
             Gravity Whip ( 2 range - lashes out with gravity. Can impact single areas, and then crush with overwhelming gravity force.)
                             normal whips pull towards you, this grabs you and then crushingly pulls you to the floor/ceiling
+
+                            Erasure Cannon
 LASER
         Laser Wire
         Laser Gun *RANGE*
@@ -87,12 +96,16 @@ No Equip (Fists - Melee)
 PIERCING
     Stabbing gloves
 
+    Pistol (https://images.gemquery.com/263/content_2638417.jpg)
+
         Mimetic Arm
 
 
         Bolt Thrower *RANGE*
 
             Gatling Gun
+
+                Heavy micro rifle
 
                     Railgun *RANGE* (have image idea)
 
@@ -103,17 +116,25 @@ PIERCING
 
                     Fernblade
 
-POISON (no initial damage - just done addiction stuff)
+POISON (For these weapons, we can design some that do no initial damage - just stack poison)
                 Jelly Rod
 
 PLASMA
-            Blaster
-                Blaster Rifle
+            Blaster (Plasma Pistol)
+                Blaster Rifle (Plasma Rifle)
+
+
+                        Plasma Cannon
+
+                                Blast Cannon
+
 
 RADIATION (no initial damage - just does addiction stuff)
             Prion Gloves
+            Radiation Gun
 
                     Gamma Gun
+                        neutrino weapons ( look up on Google - cool stuff like passing through the earth)
 
 
 
@@ -135,46 +156,42 @@ STATION WEAPONS
 POSSIBLE WEAPONS
 
 
-3mm heavy micro rifle
+
 Autocannon
-Blast Cannon
-Chrysalis gun
-Compression Laser
+
+
+
 Distruptor Cannon
 Effectors (influence people - kind of like organic mind hacking)
 Electromagnetic coil gun
 Electromagnetic Pulse Emitter
 Electron Flux Whip (ELF)
 Energy Disk
-Erasure Cannon
+
 Fusion Weapons
 Fusion Lance
 Gauss rifle
-Gravity weapons
-Gravgun
-grenade launcher
+
+
 Grid-fire impulsor
 Heavy Blaster
 Heavy Laser
-Knife missiles
+
 line gun
 Liquid Hydrogen Weapons
 Monofilament warp
 Nanite Cannon
-neutrino weapons ( look up on Google - cool stuff like passing through the earth)
+
 proton pack
 Pulse Pistol
 Pulse Rifle
-Plasma Cannon
-Plasma Pistol
-Plasma Rifle
+
 particle beam phalanx
 pulse rifle
 phase-plasma pulse rifle
 Quantum Gun
-Radiation Gun
-Refrigerator later. Shoots a ball of something at someone, then collects the energy/heat 
-    around that and shoots off laser away from it
+
+
 Thunderbolter
 Selfmotivated effector sidearm
 Thudder

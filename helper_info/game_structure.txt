@@ -57,6 +57,7 @@ FREE/PASSIVE
                         Complexity: 36-40
                         Damage: Melee 8, Range 5
                         Defense (player armor): 6, Researching: 60/60
+                        Armor Types: Semiliquid Space Armor, Researching: 60/60
 
 
                             TIER 7 - Crystal, HyperDiamond, Carrion Glass
@@ -81,7 +82,15 @@ FREE/PASSIVE
                                     Defense (player armor): 9
                                     Armor Types: Hypercrystal, Researching: 90/90
 
-                                        TIER 10 - Crystadmantium (Crystonium), Antimatter, Quantum Battery 
+
+                                        TIER 10 Hypercrystal, Crystal Battery
+                                        Minimum Monster Damage: 140
+                                        Complexity: 65-69
+                                        Damage: 11, 8
+                                        Defense (player armor): 9
+                                        Armor Types: Hypercrystal, Researching: 90/90
+
+                                        TIER BIG - Crystadmantium (Crystonium), Antimatter, Quantum Battery 
                                         Minimum Monster Damage: 200
                                         Complexity: 100+
                                         Damage: 12, 9

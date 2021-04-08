@@ -1872,19 +1872,20 @@ async function kill(dirty, player_index, killed_by_text = "") {
 
         // Get the socket the player is connected with
         let player_socket = world.getPlayerSocket(dirty, player_index);
-        if(helper.isFalse(player_socket)) {
-            console.log("Player doesn't look to be currently connected");
-        } else {
-            console.log("Got player socket id as: " + player_socket.id);
+
+        // lets see what the player has on their body, and put it in the dead body
+        let body_index = await game_object.getIndex(dirty, dirty.players[player_index].body_id);
+        console.log("Got body index as: " + body_index + ". Player body id was: " + dirty.players[player_index].body_id);
+
+
+        let dead_body_index = await game.createDeadBody(player_socket, dirty, body_index);
+
+        if(dead_body_index !== -1) {
+            dirty.objects[dead_body_index].player_id = dirty.players[player_index].id;
+            dirty.objects[dead_body_index].has_change = true;
         }
+        
 
-
-        // We're going to spawn a dead body whether we can place it or not
-        let insert_object_type_data = { 'object_type_id': 151 };
-        let new_object_index = await world.insertObjectType(false, dirty, insert_object_type_data);
-
-
-        console.log("Created the dead body");
 
         // Players can die while on a planet, in their ship, or if their ship got destroyed
 
@@ -1903,7 +1904,7 @@ async function kill(dirty, player_index, killed_by_text = "") {
             if(can_place_result) {
                 
 
-                await game_object.place(false, dirty, { 'object_index': new_object_index,
+                await game_object.place(false, dirty, { 'object_index': dead_body_index,
                     'planet_coord_index': coord_index });
 
                 /*
@@ -1915,7 +1916,7 @@ async function kill(dirty, player_index, killed_by_text = "") {
 
             } else {
 
-                dirty.waiting_drops.push({'object_index': new_object_index, 'planet_coord_index': coord_index });
+                dirty.waiting_drops.push({'object_index': dead_body_index, 'planet_coord_index': coord_index });
                 log(chalk.yellow("Could not place dead body. Pushed to waiting_drops"));
             }
 
@@ -1930,9 +1931,9 @@ async function kill(dirty, player_index, killed_by_text = "") {
             // Don't want to overwrite the object that is already on the tile
             if(!dirty.ship_coords[coord_index].object_id) {
                 console.log("Trying to place the dead body on the ship");
-                await main.updateCoordGeneric(player_socket, { 'ship_coord_index': coord_index, 'player_id': false, 'object_index': new_object_index });
+                await main.updateCoordGeneric(player_socket, { 'ship_coord_index': coord_index, 'player_id': false, 'object_index': dead_body_index });
             } else {
-                dirty.waiting_drops.push({'object_index': new_object_index, 'ship_coord_index': coord_index });
+                dirty.waiting_drops.push({'object_index': dead_body_index, 'ship_coord_index': coord_index });
                 log(chalk.yellow("Could not place dead body. Pushed to waiting_drops"));
             }
 
@@ -1941,53 +1942,59 @@ async function kill(dirty, player_index, killed_by_text = "") {
 
             console.log("Added it to ship coord, and sent ship coord info");
 
-        } else if(dirty.players[player_index].coord_id) {
+        } 
+        // So it looks like this can end up being called when addiction is attacking a player's body but they are in the galaxy view
+        else if(dirty.players[player_index].coord_id) {
+            
+            // Lets just place the body near the airlock on the active ship of the player
+            let player_ship_index = await game_object.getIndex(dirty, dirty.players[player_index].ship_id);
+            let placing_ship_coord_index = -1;
+
+            if(player_ship_index === -1) {
+                log(chalk.yellow("Player died. Not on planet or ship (so in theory flying around space in their ship). Somehow didn't have a ship either."));
+
+            } else {
+                if(typeof dirty.objects[player_ship_index].airlock_index !== 'undefined' && dirty.objects[player_ship_index].airlock_index !== -1) {
+    
+                    placing_ship_coord_index = await world.getOpenCoordIndex(dirty, 'ship', dirty.objects[player_ship_index].airlock_index, 'object', dead_body_index, 3);
+    
+                    console.log("ship_coord_index from getting around airlock is: " + placing_ship_coord_index);
+    
+                } 
+    
+                if(placing_ship_coord_index === -1) {
+                    // we need to find a ship coord to place the player on
+                    placing_ship_coord_index = dirty.ship_coords.findIndex(function(obj) {
+                        return obj && obj.ship_id === dirty.objects[player_ship_index].id && !obj.object_type_id && !obj.object_id && !obj.player_id && !obj.monster_id; });
+                }
+
+                if(placing_ship_coord_index !== -1) {
+                    console.log("Trying to place the dead body on the ship");
+                    await main.updateCoordGeneric(player_socket, { 'ship_coord_index': placing_ship_coord_index, 'object_index': dead_body_index });
+                } else {
+                    log(chalk.yellow("Really just couldn't place the dead body...."));
+                }
+                
+    
+            }
+
+
+           
+
             /// ?????????????????
-            log(chalk.yellow("Ship should have been damaged, not player. Maybe ship got to 0 HP?"));
-            return false;
+            //log(chalk.yellow("Ship should have been damaged, not player. Maybe ship got to 0 HP?"));
+            //return false;
         }
 
 
-        // lets see what the player has on their body, and put it in the dead body
-        let body_index = await game_object.getIndex(dirty, dirty.players[player_index].body_id);
-        console.log("Got body index as: " + body_index + ". Player body id was: " + dirty.players[player_index].body_id);
-
-        // Unequip all the items (this puts basically everything back into the inventory of the player
-
-
-
-        for(let equipment_linker of dirty.equipment_linkers) {
-            if(equipment_linker) {
-                if(equipment_linker.body_id === dirty.objects[body_index].id) {
-                    await unequip(player_socket, dirty, equipment_linker.id);
+        // Remove any addictions this body had
+        for(let i = 0; i < dirty.addiction_linkers.length; i++) {
+            if(dirty.addiction_linkers[i] && dirty.addiction_linkers[i].addicted_body_id === dirty.objects[body_index].id) {
+                if(!helper.isFalse(player_socket)) {
+                    player_socket.emit('addiction_linker_info', { 'remove': true, 'addiction_linker': dirty.addiction_linkers[i] });
                 }
             }
-
         }
-
-
-        // Remove inventory items from this body, and put them in the dead body
-        for(let i = 0; i < dirty.inventory_items.length; i++) {
-            if(dirty.inventory_items[i] && dirty.inventory_items[i].player_id === dirty.players[player_index].id && dirty.inventory_items[i].body_id === dirty.objects[body_index].id) {
-
-                // remove the inventory item
-                let remove_data = { 'inventory_item_id': dirty.inventory_items[i].id, 'amount': dirty.inventory_items[i].amount };
-                let add_data = { 'adding_to_type': 'object', 'adding_to_id': dirty.objects[new_object_index].id, 'amount': dirty.inventory_items[i].amount };
-                if(dirty.inventory_items[i].object_id) {
-                    add_data.object_id = dirty.inventory_items[i].object_id;
-                }
-
-                if(dirty.inventory_items[i].object_type_id) {
-                    add_data.object_type_id = dirty.inventory_items[i].object_type_id;
-                }
-                await inventory.removeFromInventory(player_socket, dirty, remove_data);
-
-                await inventory.addToInventory(player_socket, dirty, add_data);
-            }
-        }
-
-
-        //console.log("Moved inventory items into dead body");
 
         // delete the old body
         console.log("Going to delete the old body. Body index: " + body_index);

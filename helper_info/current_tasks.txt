@@ -10,14 +10,17 @@ DOING NOW:
 
     Whenever I see a getPlanetCoordIndex, getShipCoordIndex, getCoordIndex, see if it's on a monster,object, or player, and switch it to TYPE.getCoordIndex()
 
+    If someone logs off in a ship, and you can see them, you can still attack their ship
 
-    Poison seems to not update at all, neither damaging you nor disappearing
+    Lets add some stuff to the inferno planet
+
+    Lets add some stuff to the Frozen Planet
+
+
     The shift key (I wish for a permanent keep-open button) does not keep the windows open when putting an item into the container, it also lags one action behind.
 
 
     I wouldn't hate players being able to drive through and explode salvagable stuff
-
-    Poison not going away
 
 
     Galaxy coords that players moved through are weird
@@ -64,8 +67,6 @@ same with "https://space.alphacoders.com/melee.mp3"
     Get some Sokolh for the Asteroid City
 
 
-
-    
 
 
 

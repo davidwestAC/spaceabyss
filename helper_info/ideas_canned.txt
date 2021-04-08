@@ -2,6 +2,6 @@ IDEAS WE DID NOT IMPLEMENT!
 
 
 
-Idea:   Being able to talk part of Milk Slerm's spawn, and have Slerm Milk turn into Milk Slerm
+Idea:   Being able to take part of Milk Slerm's spawn, and have Slerm Milk turn into Milk Slerm
 Why:    Slerm Milk is an object type, and having it turn into (decay into, or spawn) a Milk Slerm was a larger task than I originally thought. 
             Did an alternate implementation where Milk Slerms sometimes spawn eggs, and those can grow into (spawn) Milk Slerm.

@@ -13,7 +13,7 @@ socket.on('addiction_linker_info', function(data) {
     let linker_index = addiction_linkers.findIndex(function(obj) { return obj && obj.id === parseInt(data.addiction_linker.id); });
 
     if(data.remove && linker_index !== -1) {
-        console.log("Deleted addiction linker");
+        //console.log("Deleted addiction linker");
         delete addiction_linkers[linker_index];
         generateAddictionDisplay();
         generateInventoryDisplay();
@@ -27,10 +27,10 @@ socket.on('addiction_linker_info', function(data) {
 
     } else {
 
-        addiction_linkers[linker_index] = data.addiction_linker;
+        addiction_linkers[linker_index] = data.aCHAddiction_linker;
     }
 
-    console.log("Addiction linker index: " + linker_index);
+    //console.log("Addiction linker index: " + linker_index);
 
     addiction_linkers[linker_index].id = parseInt(addiction_linkers[linker_index].id);
 
