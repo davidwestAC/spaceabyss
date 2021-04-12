@@ -3255,26 +3255,18 @@ exports.move = move;
                         //console.log("There is an AI on this planet. AI id: " + dirty.objects[ai_index].id);
 
                         let sent_attack = false;
-                        for(let rule of dirty.rules) {
-                            if(rule.object_id === dirty.objects[ai_index].id) {
-                                //console.log("Checking rule: " + rule.rule);
 
-                                if(!sent_attack) {
-                                    if(rule.rule === 'attack_all_players') {
-                                        console.log("Player moved on a ship with attack_all_players as a rule");
-                                        let ai_attack_data = {
-                                            'ai_id': dirty.objects[ai_index].id, 'attacking_type': 'player',
-                                            'attacking_id': socket.player_id };
-                                        world.aiAttack(dirty, ai_attack_data);
-                                        sent_attack = true;
-                                    }
-                                }
-
+                        for(let r = 0; r < dirty.rules.length; r++) {
+                            if(dirty.rules[r] && dirty.rules[r].object_id === dirty.objects[ai_index].id && !sent_attack) {
+                                console.log("Player moved on a ship with attack_all_players as a rule");
+                                let ai_attack_data = {
+                                    'ai_id': dirty.objects[ai_index].id, 'attacking_type': 'player',
+                                    'attacking_id': socket.player_id };
+                                world.aiAttack(dirty, ai_attack_data);
+                                sent_attack = true;
                             }
                         }
-
-
-
+                        
                     }
 
 

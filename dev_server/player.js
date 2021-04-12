@@ -1678,7 +1678,6 @@ async function getLevel(dirty, data) {
 
                     if (equipped_object_type_index !== -1) {
                         if (data.skill_type === 'manufacturing' && dirty.object_types[equipped_object_type_index].manufacturing_modifier) {
-                            log(chalk.green("Equipped item is adding manufacturing level (augment?!?)!"));
                             level += dirty.object_types[equipped_object_type_index].manufacturing_modifier;
                         }
                     }

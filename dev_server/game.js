@@ -611,10 +611,12 @@ const world = require('./world.js');
                 dirty.addiction_linkers[addiction_linker_index].addiction_level++;
                 dirty.addiction_linkers[addiction_linker_index].tick_count = 0;
                 dirty.addiction_linkers[addiction_linker_index].has_change = true;
+
+                // let the player know they are addicted
+                socket.emit('addiction_linker_info', { 'addiction_linker': dirty.addiction_linkers[addiction_linker_index] });
             }
 
-            // let the player know they are addicted
-            socket.emit('addiction_linker_info', { 'addiction_linker': dirty.addiction_linkers[addiction_linker_index] });
+            
         } catch(error) {
             log(chalk.red("Error in game.addAddictionLinker: " + error));
             console.error(error);
@@ -2508,6 +2510,7 @@ exports.eat = eat;
     async function processDestroyData(socket, dirty, data) {
 
         try {
+            console.log("In game.processDestroyData");
 
             if(data.object_id) {
                 let object_index = await game_object.getIndex(dirty, data.object_id);
@@ -2525,7 +2528,7 @@ exports.eat = eat;
                         await main.updateCoordGeneric(dirty, {'ship_coord_index': ship_coord_index, 'object_id': false });
                     }
 
-                    let temp_obeject = {};
+                    let temp_object = {};
                     temp_object.id = data.object_id;
                     socket.emit('object_info', { 'remove': true, 'object': temp_object });
                     return false;
@@ -4780,7 +4783,7 @@ exports.eat = eat;
             // The object needs a planet coord id, ship coord id, or a coord_id
             if(helper.isFalse(dirty.objects[object_index].planet_coord_id) && helper.isFalse(dirty.objects[object_index].ship_coord_id) && 
             helper.isFalse(dirty.objects[object_index].coord_id)) {
-                log(chalk.yellow("Spawning object isn't on a coord. Maybe in inventory? Object id: " + dirty.objects[object_index].id));
+                //log(chalk.yellow("Spawning object isn't on a coord. Maybe in inventory? Object id: " + dirty.objects[object_index].id));
                 return false;
             }
 
@@ -5281,17 +5284,29 @@ exports.eat = eat;
                     return false;
                 }
 
+                // try to get the player's socket if they are connected
+                let gifting_to_player_socket = await world.getPlayerSocket(dirty, gifting_to_player_index);
+
                 let gifting_object_type_index = main.getObjectTypeIndex(object_type_id);
-
-                if(dirty.object_types[gifting_object_type_index].assembled_as_object) {
-                    log(chalk.yellow("Code this!"));
-                    return false;
-                }
-
                 console.log("gifting " + amount + " " + dirty.object_types[gifting_object_type_index].name + " to player " + dirty.players[gifting_to_player_index].id);
 
-                await inventory.addToInventory({}, dirty, 
-                    { 'adding_to_type': 'player', 'adding_to_id': player_id, 'amount': amount, 'object_type_id': object_type_id });
+                if(dirty.object_types[gifting_object_type_index].assembled_as_object) {
+
+                    for(let i = 0; i < amount; i++) {
+                        let new_object_index = await world.insertObjectType(socket, dirty, { 'object_type_id': dirty.object_types[gifting_object_type_index].id });
+                        await inventory.addToInventory(gifting_to_player_socket, dirty, { 'adding_to_type': 'player', 'adding_to_id': player_id, 
+                            'object_id': dirty.objects[new_object_index].id });
+                    }
+
+                    
+                } else {
+                    await inventory.addToInventory(gifting_to_player_socket, dirty, 
+                        { 'adding_to_type': 'player', 'adding_to_id': player_id, 'amount': amount, 'object_type_id': object_type_id });
+                }
+
+                
+
+                
             }
 
             else if(data.message.includes("/kickplayer ")) {

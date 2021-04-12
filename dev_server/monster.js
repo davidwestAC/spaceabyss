@@ -283,109 +283,109 @@ async function canPlace(dirty, scope, coord, data) {
 
 
         /********************** GO THROUGH EACH OF THE COORDS ***********************/
-        for(let checking_coord of checking_coords) {
-
-            if(checking_coord.npc_id || checking_coord.player_id) {
-                if(debug_monster_type_id === monster_type_id) {
-                    log(chalk.yellow("Blocked by player or npc"));
-                }
-                return false;
-            }
-
-            // No monster index passed in - we have to return false if there's another monster at any coord.
-            if(typeof data.monster_index === "undefined") {
-                if(checking_coord.monster_id || checking_coord.belongs_to_monster_id) {
+        for(let i = 0; i < checking_coords.length; i++) {
+            if(checking_coords[i]) {
+                if(checking_coords[i].npc_id || checking_coords[i].player_id) {
                     if(debug_monster_type_id === monster_type_id) {
-                        log(chalk.yellow("Blocked by monster"));
+                        log(chalk.yellow("Blocked by player or npc"));
                     }
                     return false;
                 }
-            } else {
-                if(checking_coord.monster_id && checking_coord.monster_id !== dirty.monsters[data.monster_index].id) {
-                    if(debug_monster_type_id === monster_type_id) {
-                        log(chalk.yellow("Blocked by monster"));
-                    }
-                    return false;
-                } else if(checking_coord.belongs_to_monster_id && checking_coord.belongs_to_monster_id !== dirty.monsters[data.monster_index].id) {
-                    if(debug_monster_type_id === monster_type_id) {
-                        log(chalk.yellow("Blocked by monster"));
-                    }
-                    return false;
-                }
-            }
-
-            if(checking_coord.object_type_id) {
-                let object_type_index = dirty.object_types.findIndex(function(obj) { return obj && obj.id === checking_coord.object_type_id; });
-
-                if(object_type_index !== -1) {
-                    if(!dirty.object_types[object_type_index].can_walk_on) {
+    
+                // No monster index passed in - we have to return false if there's another monster at any coord.
+                if(typeof data.monster_index === "undefined") {
+                    if(checking_coords[i].monster_id || checking_coords[i].belongs_to_monster_id) {
                         if(debug_monster_type_id === monster_type_id) {
-                            log(chalk.yellow("Blocked by object type"));
+                            log(chalk.yellow("Blocked by monster"));
                         }
                         return false;
                     }
-
-                    // If the object type can have rules, we have to make sure we can go through it (like a door)
-                    if(dirty.object_types[object_type_index].can_have_rules && checking_coord.object_id) {
-
-                        let passed_rules = false;
-
-                        for(let r = 0; r < dirty.rules.length; r++) {
-                            if(dirty.rules[r] && dirty.rules[r].object_id === checking_coord.object_id) {
-                                if(dirty.rules[r].rule === "allow_monsters") {
-                                    passed_rules = true;
-                                }
-                            }
+                } else {
+                    if(checking_coords[i].monster_id && checking_coords[i].monster_id !== dirty.monsters[data.monster_index].id) {
+                        if(debug_monster_type_id === monster_type_id) {
+                            log(chalk.yellow("Blocked by monster"));
                         }
-
-                        if(!passed_rules) {
+                        return false;
+                    } else if(checking_coords[i].belongs_to_monster_id && checking_coords[i].belongs_to_monster_id !== dirty.monsters[data.monster_index].id) {
+                        if(debug_monster_type_id === monster_type_id) {
+                            log(chalk.yellow("Blocked by monster"));
+                        }
+                        return false;
+                    }
+                }
+    
+                if(checking_coords[i].object_type_id) {
+                    let object_type_index = dirty.object_types.findIndex(function(obj) { return obj && obj.id === checking_coords[i].object_type_id; });
+    
+                    if(object_type_index !== -1) {
+                        if(!dirty.object_types[object_type_index].can_walk_on) {
                             if(debug_monster_type_id === monster_type_id) {
-                                log(chalk.yellow("Did not pass rules"));
+                                log(chalk.yellow("Blocked by object type"));
                             }
                             return false;
                         }
-
+    
+                        // If the object type can have rules, we have to make sure we can go through it (like a door)
+                        if(dirty.object_types[object_type_index].can_have_rules && checking_coords[i].object_id) {
+    
+                            let passed_rules = false;
+    
+                            for(let r = 0; r < dirty.rules.length; r++) {
+                                if(dirty.rules[r] && dirty.rules[r].object_id === checking_coords[i].object_id) {
+                                    if(dirty.rules[r].rule === "allow_monsters") {
+                                        passed_rules = true;
+                                    }
+                                }
+                            }
+    
+                            if(!passed_rules) {
+                                if(debug_monster_type_id === monster_type_id) {
+                                    log(chalk.yellow("Did not pass rules"));
+                                }
+                                return false;
+                            }
+    
+                        }
                     }
+    
+    
                 }
-
-
-            }
-
-            // No matter the coord, if the floor type doesn't allow it, it doesn't allow it
-            let floor_type_index = main.getFloorTypeIndex(checking_coord.floor_type_id);
-
-            // Couldn't get the floor type of the coord - that's a false unless an event is creating that coord with a floor
-            if(floor_type_index === -1 && typeof data.event_provides_floor === "undefined") {
-                if(dirty.monster_types[monster_type_index].id === debug_monster_type_id) {
-                    log(chalk.yellow("Can't place monsters on no floor if the placement doesn't provide a floor"));
-                }
-                return false;
-            } else {
-
-                if(!dirty.floor_types[floor_type_index].can_build_on) {
-
+    
+                // No matter the coord, if the floor type doesn't allow it, it doesn't allow it
+                let floor_type_index = main.getFloorTypeIndex(checking_coords[i].floor_type_id);
+    
+                // Couldn't get the floor type of the coord - that's a false unless an event is creating that coord with a floor
+                if(floor_type_index === -1 && typeof data.event_provides_floor === "undefined") {
                     if(dirty.monster_types[monster_type_index].id === debug_monster_type_id) {
-                        log(chalk.yellow("Can't place monsters on that floor type (Can't build on)"));
+                        log(chalk.yellow("Can't place monsters on no floor if the placement doesn't provide a floor"));
                     }
                     return false;
-                }
+                } else {
     
-                if(dirty.floor_types[floor_type_index].is_protected) {
+                    if(!dirty.floor_types[floor_type_index].can_build_on) {
     
-                    if(dirty.monster_types[monster_type_index].id === debug_monster_type_id) {
-                        log(chalk.yellow("Can't spawn monster - That floor type is protected"));
+                        if(dirty.monster_types[monster_type_index].id === debug_monster_type_id) {
+                            log(chalk.yellow("Can't place monsters on that floor type (Can't build on)"));
+                        }
+                        return false;
                     }
-                    return false;
+        
+                    if(dirty.floor_types[floor_type_index].is_protected) {
+        
+                        if(dirty.monster_types[monster_type_index].id === debug_monster_type_id) {
+                            log(chalk.yellow("Can't spawn monster - That floor type is protected"));
+                        }
+                        return false;
+                    }
+        
                 }
-    
             }
-
-            
-
         }
+
 
         if(debug_monster_type_id === monster_type_id) {
             log(chalk.green("Returning true in monster.canPlace on debug monster type id"));
+            console.log("Coord id: " + coord.id + "coord.player_id: " + coord.player_id);
         }
 
         return true;
@@ -1282,6 +1282,8 @@ async function move(dirty, i, data) {
         let new_coord_index = -1;
         let new_coord = {};
 
+        let pre_verified_can_place = false;
+
 
         // If we already have a path, we just use that!
         if(typeof dirty.monsters[i].path !== "undefined" && dirty.monsters[i].path[0]) {
@@ -1326,37 +1328,37 @@ async function move(dirty, i, data) {
                 new_y = old_coord.tile_y + change_y;
             } else if(data.reason === 'battle') {
                 //console.log("Doing battle move");
-
+                //console.log("Being attacked type: " + data.battle_linker.being_attacked_type);
+                
+            
                 // get the thing the monster is attacking
-
                 if(data.battle_linker.being_attacked_type === 'player') {
+                    //console.log("Moving monster due to attacking player. Scope is: " + scope);
+
                     let player_index = await player.getIndex(dirty, { 'player_id': data.battle_linker.being_attacked_id });
 
-                    if(dirty.players[player_index].planet_coord_id) {
-                        let player_planet_coord_index = await main.getPlanetCoordIndex({ 'planet_coord_id': dirty.players[player_index].planet_coord_id });
-                        attacking_coord = dirty.planet_coords[player_planet_coord_index];
-                        attacking_coord_index = player_planet_coord_index;
-                    } else if(dirty.players[player_index].ship_coord_id) {
-                        let player_ship_coord_index = await main.getShipCoordIndex({ 'ship_coord_id': dirty.players[player_index].ship_coord_id });
-                        attacking_coord = dirty.ship_coords[player_ship_coord_index];
-                        attacking_coord_index = player_ship_coord_index;
+                    attacking_coord_index = await player.getCoordIndex(dirty, player_index, scope);
+
+                    if(scope === 'planet' && attacking_coord_index !== -1) {
+                        attacking_coord = dirty.planet_coords[attacking_coord_index];
+                      
+                    } else if(scope === 'ship' && attacking_coord_index !== -1) {
+                        attacking_coord = dirty.ship_coords[attacking_coord_index];
                     }
+
                 } else if(data.battle_linker.being_attacked_type === 'object') {
+                    //console.log("Moving monster due to attacking object. Scope is: " + scope);
                     let object_index = await game_object.getIndex(dirty, data.battle_linker.being_attacked_id);
 
-                    if(dirty.objects[object_index].planet_coord_id) {
-                        let object_planet_coord_index = await main.getPlanetCoordIndex({ 'planet_coord_id': dirty.objects[object_index].planet_coord_id });
-                        attacking_coord = dirty.planet_coords[object_planet_coord_index];
-                        attacking_coord_index = object_planet_coord_index;
-                    } else if(dirty.objects[object_index].ship_coord_id) {
-                        let object_ship_coord_index = await main.getShipCoordIndex({ 'ship_coord_id': dirty.objects[object_index].ship_coord_id });
-                        attacking_coord = dirty.ship_coords[object_ship_coord_index];
-                        attacking_coord_index = object_ship_coord_index;
-                    } else if(dirty.objects[object_index].coord_id) {
-                        let object_coord_index = await main.getCoordIndex({ 'coord_id': dirty.objects[object_index].coord_id });
-                        attacking_coord = dirty.coords[object_coord_index];
-                        attacking_coord_index = object_coord_index;
+                    attacking_coord_index = await game_object.getCoordIndex(dirty, object_index, scope);
+
+                    if(scope === 'planet' && attacking_coord_index !== -1) {
+                        attacking_coord = dirty.planet_coords[attacking_coord_index];
+                      
+                    } else if(scope === 'ship' && attacking_coord_index !== -1) {
+                        attacking_coord = dirty.ship_coords[attacking_coord_index];
                     }
+
                 }
 
                 let x_difference = main.diff(attacking_coord.tile_x, old_coord.tile_x);
@@ -1580,93 +1582,34 @@ async function move(dirty, i, data) {
 
 
 
-                } else if(dirty.monster_types[data.monster_type_index].attack_movement_type === 'warp_to') {
+                } 
+                // WARP TO
+                else if(dirty.monster_types[data.monster_type_index].attack_movement_type === 'warp_to') {
 
-                    let found_coord = false;
-
-                    for(let x = attacking_coord.tile_x - 1;
-                        x <= attacking_coord.tile_x + 1; x++) {
-                        for(let y = attacking_coord.tile_y - 1;
-                            y <= attacking_coord.tile_y + 1; y++) {
-
-                            if(!found_coord) {
-                                let checking_data = {};
-
-                                if(scope === 'planet') {
-
-                                    let checking_data = { 'planet_id': attacking_coord.planet_id,
-                                        'planet_level': attacking_coord.level,
-                                        'tile_x': x, 'tile_y':y };
-                                    let checking_coord_index = await main.getPlanetCoordIndex(checking_data);
-
-                                    if(checking_coord_index !== -1) {
-                                        let monster_can_place_result = await canPlace(dirty, 'planet',
-                                        dirty.planet_coords[checking_coord_index], {'monster_index': i });
-
-                                        if(checking_coord_index !== -1 && monster_can_place_result === true ) {
-
-                                            new_x = dirty.planet_coords[checking_coord_index].tile_x;
-                                            new_y = dirty.planet_coords[checking_coord_index].tile_y;
-
-                                            change_x = new_x - old_coord.tile_x;
-                                            change_y = new_y - old_coord.tile_y;
-                                            found_coord = true;
-
-                                        }
-                                    }
-
-                                    
-                                } else if(scope === 'ship') {
-
-                                    let checking_data = { 'ship_id': attacking_coord.ship_id,
-                                        'level': attacking_coord.level,
-                                        'tile_x': x, 'tile_y':y };
-                                    let checking_coord_index = await main.getShipCoordIndex(checking_data);
-
-                                    let monster_can_place_result = await canPlace(dirty, 'ship',
-                                        dirty.ship_coords[checking_coord_index], { 'monster_index': i });
-
-                                    if(checking_coord_index !== -1 && monster_can_place_result === true ) {
-
-                                        new_x = dirty.ship_coords[checking_coord_index].tile_x;
-                                        new_y = dirty.ship_coords[checking_coord_index].tile_y;
-
-                                        change_x = new_x - old_coord.tile_x;
-                                        change_y = new_y - old_coord.tile_y;
-
-                                        found_coord = true;
-
-                                    }
-
-                                } else if(scope === 'galaxy') {
-                                    console.log("Monster is warp moving in galaxy");
-
-                                    let checking_data = { 'tile_x': x, 'tile_y':y };
-                                    let checking_coord_index = await main.getCoordIndex(checking_data);
-
-                                    let monster_can_place_result = await canPlace(dirty, 'galaxy',
-                                        dirty.coords[checking_coord_index], { 'monster_index': i });
-
-                                    if(checking_coord_index !== -1 && monster_can_place_result === true ) {
-
-                                        new_x = dirty.coords[checking_coord_index].tile_x;
-                                        new_y = dirty.coords[checking_coord_index].tile_y;
-
-                                        change_x = new_x - old_coord.tile_x;
-                                        change_y = new_y - old_coord.tile_y;
-
-                                        found_coord = true;
-                                        console.log("Found new coord to place at!");
-
-                                    }
-                                }
-
-
+                    if(attacking_coord_index === -1) {
+                        //log(chalk.yellow("Did not find attacking coord"));
+                    } else {
+                        new_coord_index = await world.getOpenCoordIndex(dirty, scope, attacking_coord_index, 'monster', i, 1);
+                        if(new_coord_index !== -1) {
+                            
+                            pre_verified_can_place = true;
+                            
+                            if(scope === 'planet') {
+                                new_coord = dirty.planet_coords[new_coord_index];
+                                new_x = dirty.planet_coords[new_coord_index].tile_x;
+                                new_y = dirty.planet_coords[new_coord_index].tile_y;
+                            } else if(scope === 'ship') {
+                                new_coord = dirty.ship_coords[new_coord_index];
+                                new_x = dirty.ship_coords[new_coord_index].tile_x;
+                                new_y = dirty.ship_coords[new_coord_index].tile_y;
+                            } else if(scope === 'galaxy') {
+                                new_coord = dirty.coords[new_coord_index];
+                                new_x = dirty.coords[new_coord_index].tile_x;
+                                new_y = dirty.coords[new_coord_index].tile_y;
                             }
-
-
-                        }
+                        } 
                     }
+                    
 
                 }
 
@@ -1759,7 +1702,7 @@ async function move(dirty, i, data) {
                 new_coord = dirty.planet_coords[new_coord_index];
             } else if(dirty.monsters[i].coord_id) {
 
-                console.log("Trying to move monster in the galaxy!")
+                //console.log("Trying to move monster in the galaxy!")
 
                 // We've lost any direction information at this point - so we can just check for x,y changes to see if we can pull neighbor coords
                 let used_new_system = false;
@@ -1808,11 +1751,17 @@ async function move(dirty, i, data) {
         //    can_place_data.debug = true;
         //}
 
-        let can_place = await canPlace(dirty, scope, new_coord, { 'monster_index': i });
+        let can_place = false;
+        if(pre_verified_can_place) {
+            can_place = true;
+        } else {
+            can_place = await canPlace(dirty, scope, new_coord, { 'monster_index': i });
+        }
+
+        
 
 
         if(!can_place) {
-
 
             // If we have a path and we just failed to place, the path is invalid!
             if(typeof dirty.monsters[i].path !== "undefined" && dirty.monsters[i].path.length > 0) {
@@ -1829,15 +1778,21 @@ async function move(dirty, i, data) {
                     let object_index = await game_object.getIndex(dirty, dirty.planet_coords[new_coord_index].object_id);
                     if(object_index !== -1) {
                         if(dirty.objects[object_index].player_id) {
-                            console.log("A player built object is blocking the monster. The monster is now going to attack it");
 
-                            // remove the previous battle linker
-                            await world.removeBattleLinkers(dirty, { 'battle_linker_id': dirty.battle_linkers[battle_linker_index].id });
+                            let player_object_type_index = main.getObjectTypeIndex(dirty.objects[object_index].object_type_id);
+                            if(!dirty.object_types[player_object_type_index].can_walk_on || dirty.object_types[player_object_type_index].can_have_rules) {
+                                console.log("A player built object is blocking the monster. The monster is now going to attack it");
 
-                            // add in the new battle linker
-                            await world.addBattleLinker({}, dirty, { 'attacking_id': dirty.monsters[i].id, 'attacking_type': 'monster',
-                                'being_attacked_id': dirty.objects[object_index].id, 'being_attacked_type': 'object' });
+                                // remove the previous battle linker
+                                await world.removeBattleLinkers(dirty, { 'battle_linker_id': dirty.battle_linkers[battle_linker_index].id });
+    
+                                // add in the new battle linker
+                                await world.addBattleLinker({}, dirty, { 'attacking_id': dirty.monsters[i].id, 'attacking_type': 'monster',
+                                    'being_attacked_id': dirty.objects[object_index].id, 'being_attacked_type': 'object' });
+    
+                            }
 
+                        
                         }
                     }
                 }
@@ -2087,7 +2042,7 @@ async function move(dirty, i, data) {
             dirty.monsters[i].coord_id = new_coord.id;
             dirty.monsters[i].coord_index = new_coord_index;
             dirty.monsters[i].has_change = true;
-            console.log("End of monster.move. Updated monster coord id to: " + dirty.monsters[i].coord_id);
+            //console.log("End of monster.move. Updated monster coord id to: " + dirty.monsters[i].coord_id);
         }
 
         // update the room with the move

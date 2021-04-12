@@ -1,3 +1,30 @@
+## [0.2.43] - 2021-04-12
+
+### Added
+- Support for Shift + click for put in
+- Vueg player body can now eat the base forms of algae (but none of the processed forms)
+
+
+### Changed
+- There is now a 300ms delay on the put/take click and the Shift + click regeneration. This should give the client/server time to have updated data. (Mix of https://github.com/Luke100000/spaceabyss/commit/df66cab9bd52797e932e09e50d39d7c6500c3dae and my own stuff )
+- Lots of server side improvements for monsters attacking. The server would get a little laggy if there was a lot of AI stuff going on. This should be improved, though 
+there is still more work to do on this front.
+- Reduced attack movement delay for most 2000ms monsters to 1000ms
+- Reduced the chance of being addicted to most things. Every 5% of addiction chance is reduced to 2% (e.g. 10% is now 4%)
+- There was a discrepancy between Human/MLM consuming M Man. I've made them more consistent.
+
+### Fixed
+- Monsters would attack dead body bags destroying everything in them (hotfixed in 0.2.42)
+- Bug with checking rules on ships
+- AIs spawning tons of space constructs instead of just one
+- Players with pods not being able to salvage in the ship/planet view
+- Bug with placing monsters based on our new getOpenCoordIndex system
+- Cleaned up a few broken remnant items
+- Admin gifting of objects now works ( we use this ONLY when a player loses things due to a verified in game bug )
+- Bug with the addiction display popping in and out
+- Not showing manufacturing + and - on eating/addiction display
+- When other players moved their ships around the galaxy, it would cause the galaxy tiles to appear blank. These tiles should update now.
+
 ## [0.2.42] - 2021-04-08
 
 ### Added

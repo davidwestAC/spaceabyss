@@ -156,7 +156,7 @@ function submitShipName(ship_id) {
     }
 }
 
-$(document).on('click', 'button', function () {
+$(document).on('click', 'button', async function () {
     //console.log("Clicked button");
     const clicked_id = this.id;
     let clicked_x = false;
@@ -865,8 +865,25 @@ $(document).on('click', 'button', function () {
         socket.emit('place_data', { inventory_item_id: inventory_item_id, storage_object_id: storage_object_id,
             'amount': amount });
 
-        sel_click_menu.empty();
-        sel_click_menu.hide();
+        if(!shiftKey.isDown) {
+            sel_click_menu.empty();
+            sel_click_menu.hide();
+        } else {
+            console.log("Placed/put in from something while holding shift. Lets update that display now....");
+
+            if(storage_object_id) {
+                let storage_object_index = getObjectIndex(storage_object_id);
+                let object_info = getObjectInfo(storage_object_index);
+                if(object_info.coord) {
+                    await new Promise(r => setTimeout(r, 300));
+                    sel_click_menu.empty();
+                    showClickMenuObject(object_info.coord);
+                }
+                
+
+            }
+
+        }
     }
 
 
@@ -1290,6 +1307,7 @@ $(document).on('click', 'button', function () {
                 let storage_object_index = getObjectIndex(storage_object_id);
                 let object_info = getObjectInfo(storage_object_index);
                 if(object_info.coord) {
+                    await new Promise(r => setTimeout(r, 300));
                     sel_click_menu.empty();
                     showClickMenuObject(object_info.coord);
                 }

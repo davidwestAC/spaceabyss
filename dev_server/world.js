@@ -648,9 +648,7 @@ exports.addToArea = addToArea;
 
 
 
-/*
-data:   ai_id   |   atacking_type   |   attacking_id
-*/
+
 /**
  *
  * @param {Object} dirty
@@ -1143,19 +1141,22 @@ exports.aiAttack = aiAttack;
 */
 
 
-// Higher leve, more generic function than aiAttack. This is mean to see if we start retaliating against something
+// Higher level, more generic function than aiAttack. This is mean to see if we start retaliating against something
 async function aiRetaliate(dirty, ai_index, attacking_type, attacking_id) {
 
     try {
         // AI is going to hit back the thing that violated its rules
         // Make sure that the AI isn't already engaged with this person
+
+
         let existing_attack_linkers = dirty.battle_linkers.filter(filtered => filtered.being_attacked_type === attacking_type &&
             filtered.being_attacked_id === attacking_id && filtered.attacking_type === 'monster');
         let already_attacking = false;
 
         for (let linker of existing_attack_linkers) {
             let monster_index = await monster.getIndex(dirty, linker.attacking_id);
-            if (dirty.monsters[monster_index].monster_type_id === 33 || dirty.monsters[monster_index].monster_type_id === 57) {
+            if (dirty.monsters[monster_index].monster_type_id === 33 || dirty.monsters[monster_index].monster_type_id === 57 || 
+                dirty.monsters[monster_index].monster_type_id === 107) {
                 already_attacking = true;
             }
         }
@@ -1169,9 +1170,8 @@ async function aiRetaliate(dirty, ai_index, attacking_type, attacking_id) {
             };
 
             aiAttack(dirty, attack_data);
-        } else {
-            //console.log("AI is already attacking.");
-        }
+        } 
+
     } catch(error) {
         log(chalk.red("Error in world.aiRetaliate: " + error));
         console.error(error);
@@ -2836,13 +2836,13 @@ async function getOpenCoordIndex(dirty, coord_type, base_coord_index, placing_ty
                     let can_place_result = await monster.canPlace(dirty, coord_type, left_coord,  {'monster_index': placing_index } );
                     
                     if(can_place_result === true) {
-                        return base_coord_index;
+                        return base_coord.left_coord_index;
                     }
                 } else if(placing_type === 'monster_type') {
                     let can_place_result = await monster.canPlace(dirty, coord_type, left_coord,  {'monster_type_id': dirty.monster_types[placing_index].id } );
                     
                     if(can_place_result === true) {
-                        return base_coord_index;
+                        return base_coord.left_coord_index;
                     }
                 }
                 
@@ -2890,13 +2890,13 @@ async function getOpenCoordIndex(dirty, coord_type, base_coord_index, placing_ty
                     let can_place_result = await monster.canPlace(dirty, coord_type, right_coord,  {'monster_index': placing_index } );
                     
                     if(can_place_result === true) {
-                        return base_coord_index;
+                        return base_coord.right_coord_index;
                     }
                 } else if(placing_type === 'monster_type') {
                     let can_place_result = await monster.canPlace(dirty, coord_type, right_coord,  {'monster_type_id': dirty.monster_types[placing_index].id } );
                     
                     if(can_place_result === true) {
-                        return base_coord_index;
+                        return base_coord.right_coord_index;
                     }
                 }
             } 
@@ -2944,13 +2944,13 @@ async function getOpenCoordIndex(dirty, coord_type, base_coord_index, placing_ty
                     let can_place_result = await monster.canPlace(dirty, coord_type, up_coord,  {'monster_index': placing_index } );
                     
                     if(can_place_result === true) {
-                        return base_coord_index;
+                        return base_coord.up_coord_index;
                     }
                 } else if(placing_type === 'monster_type') {
                     let can_place_result = await monster.canPlace(dirty, coord_type, up_coord,  {'monster_type_id': dirty.monster_types[placing_index].id } );
                     
                     if(can_place_result === true) {
-                        return base_coord_index;
+                        return base_coord.up_coord_index;
                     }
                 }
             }
@@ -2999,13 +2999,13 @@ async function getOpenCoordIndex(dirty, coord_type, base_coord_index, placing_ty
                     let can_place_result = await monster.canPlace(dirty, coord_type, down_coord,  {'monster_index': placing_index } );
                     
                     if(can_place_result === true) {
-                        return base_coord_index;
+                        return base_coord.down_coord_index;
                     }
                 } else if(placing_type === 'monster_type') {
                     let can_place_result = await monster.canPlace(dirty, coord_type, down_coord,  {'monster_type_id': dirty.monster_types[placing_index].id } );
                     
                     if(can_place_result === true) {
-                        return base_coord_index;
+                        return base_coord.down_coord_index;
                     }
                 }
             }
@@ -5033,8 +5033,6 @@ async function shielded(dirty, damage_amount, object_index) {
         if (!dirty.object_types[object_type_index].is_ship) {
             return false;
         }
-
-        console.log("Seeing if ship is shielded");
 
         // see if we have energy storage with energy
         let energy_storage_ship_coords = dirty.ship_coords.filter(ship_coord => ship_coord.ship_id === dirty.objects[object_index].id &&

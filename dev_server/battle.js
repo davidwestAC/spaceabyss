@@ -625,8 +625,11 @@ const world = require('./world.js');
             let monster_attack = await getMonsterAttack(dirty, attacking_monster_index, calculating_range);
 
             if(monster_attack === false) {
+                battle_linker.hit_last_turn = false;
                 return false;
             }
+
+            battle_linker.hit_last_turn = true;
 
             let attack = monster_attack.damage_amount;
             let defense = dirty.monster_types[defending_monster_type_index].defense;
@@ -711,8 +714,11 @@ const world = require('./world.js');
             let monster_attack = await getMonsterAttack(dirty, monster_index, calculating_range);
 
             if(monster_attack === false) {
+                battle_linker.hit_last_turn = false;
                 return false;
             }
+
+            battle_linker.hit_last_turn = true;
 
             let attack = monster_attack.damage_amount;
 
@@ -741,7 +747,6 @@ const world = require('./world.js');
             let shielded = await world.shielded(dirty, damage_amount, object_index);
 
             if(shielded) {
-                console.log("Defending object has shields!");
                 io.to(object_info.room).emit('damaged_data',
                     {'object_id': dirty.objects[object_index].id, 'damage_amount': damage_amount, 'was_damaged_type': 'energy',
                         'damage_source_type':'object', 'damage_source_id': dirty.monsters[monster_index].id,
@@ -869,8 +874,11 @@ const world = require('./world.js');
             if(monster_attack === false) {
                 //console.log("monster did not have an attack");
                 //console.log(dirty.monsters[monster_index].path);
+                battle_linker.hit_last_turn = false;
                 return false;
             }
+
+            battle_linker.hit_last_turn = true;
 
             let defense = await player.calculateDefense(dirty, player_index, monster_attack.damage_type);
 
@@ -973,26 +981,34 @@ const world = require('./world.js');
         try {
             // increment battle_time by 100
             global.battle_time += 100;
-            // Get monsters that are attacking something
-            let monster_battle_linkers = dirty.battle_linkers.filter(battle_linker => battle_linker.attacking_type === 'monster');
 
-            for(let battle_linker of monster_battle_linkers) {
+            for(let i = 0; i < dirty.battle_linkers.length; i++) {
+                if(dirty.battle_linkers[i] && dirty.battle_linkers[i].attacking_type === 'monster') {
+                    let monster_index = await monster.getIndex(dirty, dirty.battle_linkers[i].attacking_id);
+                    let monster_type_index = main.getMonsterTypeIndex(dirty.monsters[monster_index].monster_type_id);
 
-                let monster_index = await monster.getIndex(dirty, battle_linker.attacking_id);
-                let monster_type_index = main.getMonsterTypeIndex(dirty.monsters[monster_index].monster_type_id);
+                    let attack_movement_delay = 2000;
+                    if(dirty.monster_types[monster_type_index].attack_movement_delay) {
+                        attack_movemet_delay = dirty.monster_types[monster_type_index].attack_movement_delay;
+                    }
 
-                let attack_movement_delay = 2000;
-                if(dirty.monster_types[monster_type_index].attack_movement_delay) {
-                    attack_movemet_delay = dirty.monster_types[monster_type_index].attack_movement_delay;
+                    // If it's evenly divisible - we're on!
+                    if(global.battle_time % dirty.monster_types[monster_type_index].attack_movement_delay === 0) {
+
+                        // So, we don't actually need to move the monster if they are hitting what they need to hit and still in range
+                        // This does give a 1 turn delay in favor of players. Skip this for the AI stuff for now
+                        if(typeof dirty.battle_linkers[i].hit_last_turn === 'undefined' || dirty.battle_linkers[i].hit_last_turn === false 
+                        || dirty.monster_types[monster_type_index].attack_movement_type === 'warp_to') {
+                            await monster.move(dirty, monster_index, { 'reason': 'battle', 'battle_linker': dirty.battle_linkers[i],
+                            'monster_type_index': monster_type_index });
+                        } 
+                        
+                    }
                 }
-
-                // If it's evenly divisible - we're on!
-                if(global.battle_time % dirty.monster_types[monster_type_index].attack_movement_delay === 0) {
-                    await monster.move(dirty, monster_index, { 'reason': 'battle', 'battle_linker': battle_linker,
-                        'monster_type_index': monster_type_index });
-                }
-
             }
+
+
+            
 
             if(global.battle_time > 100000) {
                 global.battle_time = 100;
@@ -1425,7 +1441,6 @@ const world = require('./world.js');
             let shielded = await world.shielded(dirty, damage_amount, defending_object_index);
 
             if(shielded) {
-                console.log("Defending object has shields!");
                 io.to(defending_object_info.room).emit('damaged_data',
                     {'object_id': dirty.objects[defending_object_index].id, 'damage_amount': damage_amount, 'was_damaged_type': 'energy',
                         'damage_source_type':'object', 'damage_source_id': dirty.objects[attacking_object_index].id,

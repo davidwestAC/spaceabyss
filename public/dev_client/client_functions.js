@@ -2048,6 +2048,10 @@ function generateEatingLinkerDisplay() {
                     html_string += " +" + race_eating_linkers[race_eating_linker_index].defense + "<i class=\"fad fa-shield-alt\"></i> ";
                 }
 
+                if (race_eating_linkers[race_eating_linker_index].manufacturing) {
+                    html_string += " +" + race_eating_linkers[race_eating_linker_index].manufacturing + "<i class=\"fas fa-industry-alt\"></i> ";
+                }
+
                 html_string += " " + eating_linker.ticks_completed +
                     "/" + race_eating_linkers[race_eating_linker_index].tick_count + "<br>";
             } else {
@@ -4104,6 +4108,11 @@ function generateAddictionDisplay() {
                     if (race_eating_linkers[race_eating_linker_index].defense) {
                         let negative_defense_amount = race_eating_linkers[race_eating_linker_index].defense * addiction_linker.addiction_level;
                         adding_string += " -" + negative_defense_amount + " Defense ";
+                    }
+
+                    if (race_eating_linkers[race_eating_linker_index].manufacturing) {
+                        let negative_manufacturing_amount = race_eating_linkers[race_eating_linker_index].manufacturing * addiction_linker.addiction_level;
+                        adding_string += " -" + negative_manufacturing_amount + " Manufacturing ";
                     }
                 }
 
@@ -7560,7 +7569,6 @@ function loadMonsterSprites(type, type_id) {
             !scene_game.textures.exists(monster_sprites[i].key)) {
 
             scene_game.load.on('filecomplete', processFile, this);
-            console.log("")
             scene_game.load.spritesheet(monster_sprites[i].key, "https://space.alphacoders.com/images/" + monster_sprites[i].key + ".png",
                 { frameWidth: monster_sprites[i].frame_width, frameHeight: monster_sprites[i].frame_height, endFrame: monster_sprites[i].frame_count });
             scene_game.load.start();
@@ -11286,9 +11294,7 @@ function showClickMenuObjectType(coord) {
             //console.log("Can be salvaged");
 
             showSalvageOption(-1, object_type_index, coord);
-        } else {
-            console.log("Can't be salvaged");
-        }
+        } 
 
 
         // If the object type is a stairs, and the player is standing on the coord, let them move onto it to move up
@@ -11676,13 +11682,10 @@ function showSalvageOption(object_index, object_type_index, coord = {}) {
                 if (salvaging_linkers[s].coord_id === coord.id && salvaging_linkers[s].player_id === client_player_id) {
                     is_being_salvaged = true;
                     salvaging_linker_index = s;
-                    console.log("This coord is being salvaged by the player");
                 }
             }
-
         }
     }
-
 
 
     if (is_being_salvaged) {
@@ -11694,15 +11697,14 @@ function showSalvageOption(object_index, object_type_index, coord = {}) {
     
     } else {
 
-        // if it's in the galaxy, we can't salvage if our ship is a pod
         let player_can_salvage = true;
-        if ( (object_index !== -1 && objects[object_index].coord_id) || (notFalse(coord) && !coord.planet_id && !coord.ship_id) ) {
-            let player_ship_index = objects.findIndex(function (obj) { return obj && obj.id === players[client_player_index].ship_id; });
-            if (player_ship_index !== -1 && objects[player_ship_index].object_type_id === 114) {
-                player_can_salvage = false;
-                sel_click_menu.append("<a target='_blank' href='https://space.alphacoders.com/site/tutorial/ship-building'>Build A Better Ship To Salvage</a>");
-            }
+        let player_ship_index = objects.findIndex(function (obj) { return obj && obj.id === players[client_player_index].ship_id; });
+        // if it's in the galaxy, we can't salvage if our ship is a pod
+        if(current_view === 'galaxy' && player_ship_index !== -1 && objects[player_ship_index].object_type_id === 114) {
+            player_can_salvage = false;
+            sel_click_menu.append("<a target='_blank' href='https://space.alphacoders.com/site/tutorial/ship-building'>Build A Better Ship To Salvage</a>");
         }
+        
 
         if (player_can_salvage) {
             if(object_index !== -1) {

@@ -27,7 +27,7 @@ socket.on('addiction_linker_info', function(data) {
 
     } else {
 
-        addiction_linkers[linker_index] = data.aCHAddiction_linker;
+        addiction_linkers[linker_index] = data.addiction_linker;
     }
 
     //console.log("Addiction linker index: " + linker_index);
@@ -787,10 +787,6 @@ socket.on('coord_info', function (data) {
         return false;
     }
 
-    if(data.coord.object_id === 86021) {
-        console.log("Got coord with object id: " + data.coord.object_id + " on it");
-    }
-
     //console.log("Recieved coord info (galaxy coord)");
 
     let id = parseInt(data.coord.id);
@@ -851,11 +847,7 @@ socket.on('coord_info', function (data) {
 
             if(coords[coord_index].object_id !== data.coord.object_id || coords[coord_index].belongs_to_object_id !== data.coord.belongs_to_object_id) {
                 coord_needs_update = true;
-
-                drawCoord('galaxy', data.coord);
             }
-
-
 
             if(coords[coord_index].floor_type_id !== data.coord.floor_type_id) {
                 coord_needs_update = true;
@@ -865,6 +857,13 @@ socket.on('coord_info', function (data) {
             if(coords[coord_index].object_type_id !== data.coord.object_type_id) {
                 coord_needs_update = true;
                 //console.log("Object type id update for coord id: " + data.coord.id + " " + coords[coord_index].object_type_id + " doesn't match " + data.coord.object_type_id + " redrawing coord");
+            }
+
+            // It's also possible we got the coord information earlier than we normally would due to other players moving around on the coord.
+            // In this case, nothing above might have changed, so we just check if the floor tile is empty and draw it in that case
+            let current_floor_tile = map.getTileAt(coords[coord_index].tile_x, coords[coord_index].tile_y, false, 'layer_floor');
+            if (!current_floor_tile || current_floor_tile.index === -1) {
+                coord_needs_update = true;
             }
 
 
@@ -3487,7 +3486,6 @@ socket.on('salvaging_linker_info', function(data) {
                     salvaging_coord = planet_coords[salvaging_coord_index];
                 }
             } else if(salvaging_linkers[index].coord_type === 'ship') {
-                console.log("ship coord id: " + salvaging_linkers[index].coord_id);
                 let salvaging_coord_index = getShipCoordIndex({ 'ship_coord_id': salvaging_linkers[index].coord_id });
                 if(salvaging_coord_index !== -1) {
                     salvaging_coord = ship_coords[salvaging_coord_index];
@@ -3556,7 +3554,6 @@ socket.on('salvaging_linker_info', function(data) {
                     salvaging_coord = planet_coords[salvaging_coord_index];
                 }
             } else if(salvaging_linkers[index].coord_type === 'ship') {
-                console.log("ship coord id: " + salvaging_linkers[index].coord_id);
                 let salvaging_coord_index = getShipCoordIndex({ 'ship_coord_id': salvaging_linkers[index].coord_id });
                 if(salvaging_coord_index !== -1) {
                     salvaging_coord = ship_coords[salvaging_coord_index];

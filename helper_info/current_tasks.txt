@@ -12,6 +12,24 @@ DOING NOW:
 
     If someone logs off in a ship, and you can see them, you can still attack their ship
 
+    AIs not applying in the ship portal areas on planets
+
+    Players building AIs on things like Asteroid Cities that will disapper
+        (Possibly just disallow that? - or a VERY clear warning?)
+
+        Okapi built AI on Asteroid City - plus an AI core and 2 ai batteries
+
+
+    For server health, add in # of things players have galaxy wide (algae, moss, ai dust, batteries, etc)
+
+
+    Check out the rest of luke's commits
+
+    What if a player had an AI rule to not allow building of object, and then destroyed their stairs?
+        Could have actions that an AI disallows bypass the AI if it doesn't have enough energy. Or the AI could spawn something to attack the placed object.
+        (I think it would need to be the AI attacks the spawned object. Becasue a player could put ALL their AI's stuff on a higher level)
+
+
     Lets add some stuff to the inferno planet
 
     Lets add some stuff to the Frozen Planet
