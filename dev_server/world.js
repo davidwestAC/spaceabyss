@@ -742,6 +742,18 @@ async function aiAttack(dirty, data) {
             origin_tile_x = dirty.coords[being_attacked_coord_index].tile_x;
             origin_tile_y = dirty.coords[being_attacked_coord_index].tile_y;
 
+        }  else if(data.attacking_type === 'object' && dirty.objects[being_attacked_index].planet_coord_id) {
+            console.log("Set scope to planet");
+            scope = 'planet';
+            being_attacked_coord_index = await main.getPlanetCoordIndex(
+                { 'planet_coord_id': dirty.objects[being_attacked_index].planet_coord_id });
+            if(being_attacked_coord_index === -1) {
+                log(chalk.yellow("Could not find that planet coord"));
+                return false;
+            }
+            origin_tile_x = dirty.planet_coords[being_attacked_coord_index].tile_x;
+            origin_tile_y = dirty.planet_coords[being_attacked_coord_index].tile_y;
+
         } else if(data.attacking_type === 'monster' && dirty.monsters[being_attacked_index].planet_coord_id) {
             console.log("Set scope to planet");
             scope = 'planet';
@@ -863,14 +875,19 @@ async function aiAttack(dirty, data) {
         if(placing_coord_index === -1) {
             log(chalk.cyan("AI IS DIRECLTY DOING DAMAGE BABY!! BUG OR CLEVER PLAYER!?!"));
 
+            let direct_damage_amount = 50;
+            if(data.attack_level === 2) {
+                direct_damage_amount = 100;
+            }
+
             // AI attacks directly without using an edifice. 
             if(data.attacking_type === 'player') {
-                player.damage(dirty, { 'player_index': being_attacked_index, 'damage_amount': 50, 'damage_types': [] });
+                player.damage(dirty, { 'player_index': being_attacked_index, 'damage_amount': direct_damage_amount, 'damage_types': [] });
             } else if(data.attacking_type === 'object') {
                 let object_info = await game_object.getCoordAndRoom(dirty, being_attacked_index);
-                game_object.damage(dirty, being_attacked_index, 50, { 'object_info': object_info });
+                game_object.damage(dirty, being_attacked_index, direct_damage_amount, { 'object_info': object_info });
             } else if(data.attacking_type === 'monster') {
-                monster.damage(dirty, being_attacked_index, 50, {});
+                monster.damage(dirty, being_attacked_index, direct_damage_amount, {});
             }
             return false;
         }
@@ -2033,6 +2050,13 @@ async function getAIProtector(dirty, damage_amount, coord, attacking_type, data)
                     let ship_index = await game_object.getIndex(dirty, coord.ship_id);
                     if (ship_index !== -1 && dirty.objects[ship_index].ai_id) {
                         ai_index = await game_object.getIndex(dirty, dirty.objects[ship_index].ai_id);
+                    } 
+                    // Portal spawned ship
+                    else if(dirty.objects[ship_index].planet_id) {
+                        let planet_index = await planet.getIndex(dirty, { 'planet_id': dirty.objects[ship_index].planet_id });
+                        if (planet_index !== -1 && dirty.planets[planet_index].ai_id) {
+                            ai_index = await game_object.getIndex(dirty, dirty.planets[planet_index].ai_id);
+                        }
                     }
                 }
     
@@ -2087,6 +2111,8 @@ async function getAIProtector(dirty, damage_amount, coord, attacking_type, data)
 
 
         } else if (typeof data.player_index !== 'undefined') {
+
+            //console.log("In player area");
     
 
             // Check the room we are in, and if there's one, see if the rules apply to us
@@ -2099,6 +2125,13 @@ async function getAIProtector(dirty, damage_amount, coord, attacking_type, data)
                 let ship_index = await game_object.getIndex(dirty, coord.ship_id);
                 if (ship_index !== -1 && dirty.objects[ship_index].ai_id) {
                     ai_index = await game_object.getIndex(dirty, dirty.objects[ship_index].ai_id);
+                }  
+                // Portal spawned ship
+                else if(dirty.objects[ship_index].planet_id) {
+                    let planet_index = await planet.getIndex(dirty, { 'planet_id': dirty.objects[ship_index].planet_id });
+                    if (planet_index !== -1 && dirty.planets[planet_index].ai_id) {
+                        ai_index = await game_object.getIndex(dirty, dirty.planets[planet_index].ai_id);
+                    }
                 }
             }
     
@@ -5289,7 +5322,7 @@ async function tickStorytellers(dirty, force_event_id = 0) {
                     }
     
 
-                    let possible_events = dirty.events.filter(event_filter => event_filter.difficulty <= difficulty_ceiling);
+                    let possible_events = dirty.events.filter(event_filter => event_filter.difficulty > 0 && event_filter.difficulty <= difficulty_ceiling);
                     if(possible_events.length > 0) {
 
                         let chosen_event = possible_events[Math.floor(Math.random()*possible_events.length)];
@@ -5496,11 +5529,11 @@ async function tickWaitingDrops(dirty) {
                     }
                    
                     
-                    console.log("Sending to updateCoordGeneric:");
-                    console.log(update_coord_data);
+                    //console.log("Sending to updateCoordGeneric:");
+                    //console.log(update_coord_data);
 
                     await main.updateCoordGeneric(false, update_coord_data);
-                    console.log("Should have done it!");
+                    //console.log("Should have done it!");
                     delete dirty.waiting_drops[i];
 
                 }

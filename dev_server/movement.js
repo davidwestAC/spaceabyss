@@ -2291,7 +2291,7 @@ exports.move = move;
             }
 
             for(let l = dirty.planet_coords[previous_planet_coord_index].level -1; l >= 0; l--) {
-                console.log("Seeing if there's a coord on level: " + l);
+                //console.log("Seeing if there's a coord on level: " + l);
 
                 let falling_planet_coord_data = { 'planet_id': dirty.planet_coords[previous_planet_coord_index].planet_id,
                     'planet_level': l,
@@ -2306,7 +2306,7 @@ exports.move = move;
                     let can_place_result = await player.canPlace(dirty, 'planet', dirty.planet_coords[falling_planet_coord_index], data.player_index);
 
                     if(can_place_result === true) {
-                        console.log("Found a coord below, and the player can fall onto it");
+                        //console.log("Found a coord below, and the player can fall onto it");
                         await main.updateCoordGeneric(socket, {'planet_coord_index': previous_planet_coord_index, 'player_id': false });
 
                         await main.updateCoordGeneric(socket, {'planet_coord_index': falling_planet_coord_index, 'player_id': socket.player_id });
@@ -3382,7 +3382,15 @@ exports.move = move;
 
             } else if (moving_to_scope === 'ship') {
 
+                // lets send that ship info! The client needs to know if the ship has a planet_id to display/not display the 'Launch With Current Ship' button
+                let ship_index = await game_object.getIndex(dirty, dirty.ship_coords[moving_to_coord_index].ship_id);
+
+                if(ship_index !== -1) {
+                    game_object.sendInfo(socket, '', dirty, ship_index);
+                }
+
                 main.updateCoordGeneric(socket, { 'ship_coord_index': moving_to_coord_index, 'player_id': socket.player_id });
+
 
                 dirty.players[player_index].ship_coord_id = temp_coord.id;
                 dirty.players[player_index].ship_coord_index = moving_to_coord_index;

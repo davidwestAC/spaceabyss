@@ -2966,7 +2966,13 @@ function generateAirlockDisplay() {
 
     } else if (current_view === "ship") {
 
-        $('#launch').append('<button class="button is-success" id="viewchange" newview="galaxy"><i class="fad fa-rocket"></i> Launch With Current Ship</button>');
+        // Ship has a planet id. It's part of a event/portal system and players shouldn't be able to just launch from it
+        if(on_ship_index !== -1 && objects[on_ship_index].planet_id) {
+            
+        } else {
+            $('#launch').append('<button class="button is-success" id="viewchange" newview="galaxy"><i class="fad fa-rocket"></i> Launch With Current Ship</button>');
+        }
+        
     } else {
         console.log("%c Didn't draw back to galaxy OR launch buttons");
     }
@@ -9646,6 +9652,10 @@ function resetMap() {
                 saved_objects.push(object);
             }
 
+            // Save ships with planet ids
+            if(object_types[object_type_index].is_ship && object.planet_id) {
+                saved_objects.push(object);
+            }
 
 
 
@@ -10073,7 +10083,7 @@ function showClickMenu(pointer) {
 
             if (player_is_attacking) {
                 sel_click_menu.append("<button id='attackstop_player_" + coord.player_id + "' " +
-                    "player_id='" + coord.player_id + " class='button is-warning is-small'>Stop Attacking Player</button>");
+                    "player_id='" + coord.player_id + "' class='button is-warning is-small'>Stop Attacking Player</button>");
             } else {
 
                 sel_click_menu.append("<button id='attack_player_" + coord.player_id + "' " +
@@ -10469,7 +10479,7 @@ function showClickMenuNpc(coord) {
 }
 
 function showClickMenuObject(coord) {
-    //console.log("Has object id");
+    console.log("in showClickMenuObject");
     let attack_object_shown = false;
     let object_index = -1;
 
@@ -10492,9 +10502,23 @@ function showClickMenuObject(coord) {
     }
 
 
-    // If the object type is a stairs, and the player is standing on the coord, let them move onto it to move up
+    // If the object type is a portal, and the player is standing on the coord, let them move onto it to move up
     if(object_types[object_type_index].is_portal && coord.id === client_player_info.coord.id) {
         sel_click_menu.append("<button id='moveportal' class='button is-default'>Go Back</button>");
+        
+    }
+
+    // If the object type is a stairs, and the player is standing on the coord, let them move onto it to move up
+    if(object_types[object_type_index].is_stairs && coord.id === client_player_info.coord.id) {
+        console.log("Player right clicked on stairs that they are on");
+        sel_click_menu.append("<button id='moveupstairs' class='button is-default'>Move Up Stairs</button>");
+        
+    }
+
+    // If the object type is a hole, and the player is standing on the coord, let them move onto it to move up
+    if(object_types[object_type_index].is_hole && coord.id === client_player_info.coord.id) {
+        console.log("Player right clicked on hole that they are on");
+        sel_click_menu.append("<button id='movedownhole' class='button is-default'>Move Down Hole</button>");
         
     }
 
@@ -11289,6 +11313,20 @@ function showClickMenuObjectType(coord) {
             sel_click_menu.append(html_string);
         }
 
+        // Dropping onto
+        // See if anything can be dropped onto this
+        let can_be_dropped_object_types = object_types.filter(object_type => object_type.drop_requires_object_type_id === object_types[object_type_index].id);
+        if (can_be_dropped_object_types.length > 0) {
+            // For each of these, see if the client player has an inventory item that matches
+            for (let i = 0; i < can_be_dropped_object_types.length; i++) {
+                let inventory_item_index = inventory_items.findIndex(function (obj) { return obj && obj.player_id === client_player_id && obj.object_type_id === can_be_dropped_object_types[i].id; });
+                if (inventory_item_index !== -1) {
+                    sel_click_menu.append(can_be_dropped_object_types[i].name + " <button id='drop_" + inventory_items[inventory_item_index].id + "_1' x='" + coord.tile_x +
+                        "' y='" + coord.tile_y + "' amount='1' class='button is-default is-small'>Place On</button>");
+                }
+            }
+        }
+
         // Salvaging
         if (object_types[object_type_index].can_be_salvaged) {
             //console.log("Can be salvaged");
@@ -11304,10 +11342,10 @@ function showClickMenuObjectType(coord) {
             
         }
 
-        // If the object type is a stairs, and the player is standing on the coord, let them move onto it to move up
+        // If the object type is a hole, and the player is standing on the coord, let them move onto it to move up
         if(object_types[object_type_index].is_hole && coord.id === client_player_info.coord.id) {
             console.log("Player right clicked on hole that they are on");
-            sel_click_menu.append("<button id='moveupstairs' class='button is-default'>Move Down Hole</button>");
+            sel_click_menu.append("<button id='movedownhole' class='button is-default'>Move Down Hole</button>");
             
         }
 

@@ -1,3 +1,37 @@
+## [0.2.44] - 2021-04-16
+
+
+### Added
+- AI can now convert Batteries, Power Cells, Algae Power Cells, and Diamond Batteries into energy
+- If a ship is being spawned on a planet via the event system (I know this sounds odd, but stick with me), the ship object gets a planet_id which prevents people from launching off of it at any time, and allows the AI of the planet to work in that space. This is how things like Data Breaches are coded.
+- AI rules now apply on portal/ship events on a planet
+
+### Fixed
+- Being able to place Thiol Extractors (hotfixed in 0.2.43)
+- A player's ship sometimes being attackable after they logout
+- Bug with the storyteller system choosing events with 0 difficulty
+- AIs can no longer be placed in some of the areas you warp to on planets. These areas are controlled by the planetary AI
+- Attacks from objects now follow the same defensive rules as with monsters. Defense of the player is 1/2ed for every additional attack after 2. 
+- Bug with regenerating ship types not adding in stairs/holes
+- Potential bug with monsters attacking stairs/holes that are supposed to be unattackable
+- Fixed bug where a dead body could drop on stairs/hole removing it.
+
+
+### Changed
+- Modified the defeated AI message
+- Modified the ship taken over message. It will now only show up when there is a player id change on the ship
+- AIs can now be salvaged
+- Thiol Cannisters now provide 100 energy instead of 20 energy
+- Defense Drone Attack increased from 5 to 10. Defense increased from 1 to 2. HP increased from 200 to 500
+- Algae Power Cell cost increased from 4 Algae to 10 Algae
+- Thiol Drives can now consume things other than Thiol for a HEAVILY reduced efficiency (10%). You're kind of just throwing batteries and power cells into the thing to eek out enough power to land somewhere.
+- Updated a bunch of events from the destroy to disappear despawn type
+- Objects that violate an AI rules will now be able to be placed, and the AI will then attack the object and the player if energy is available
+- Less objects are covered by the 'no_building_others' rule. This now only aplies to walls, stairs, holes, things that can have rules (doors, defense drones, etc), and anything that can't be walked on
+- Instead of only tring to advance its attack once, an AI will now continually try to advance its attack every 10 turns. In the case that the attacking player has walled the area around them, the AI will directly do 100 damage every 10 turns. 
+
+
+
 ## [0.2.43] - 2021-04-12
 
 ### Added

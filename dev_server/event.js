@@ -933,11 +933,15 @@ async function spawn(dirty, event_index, data) {
 
             for(let i = 0; i < event_linkers.length; i++) {
 
+
                 // Things spawned off the grid will still be there from a spawned event that was only despawned
-                if(!event_linkers[i].spawns_off_grid) {
+                if(helper.isFalse(event_linkers[i].spawns_off_grid)) {
                     
                     // There should be an object of this type associated with the spawned_event
                     if(event_linkers[i].object_type_id) {
+
+                        let event_linker_object_type_index = main.getObjectTypeIndex(event_linkers[i].object_type_id);
+
                         let disappeared_object_index = dirty.objects.findIndex(function(obj) { return obj && obj.object_type_id === event_linkers[i].object_type_id && 
                             obj.spawned_event_id == dirty.spawned_events[reusing_spawned_event_index].id; });
 
@@ -974,8 +978,6 @@ async function spawn(dirty, event_index, data) {
                             if(event_scope === 'planet') {
                                 await game_object.place(false, dirty, { 'object_index': disappeared_object_index,
                                     'planet_coord_index': linker_coord_index });
-    
-                                //console.log("Object's planet_coord_id: " + dirty.objects[new_object_index].planet_coord_id);
                             } else if(event_scope === 'ship') {
                                 await game_object.place(false, dirty, { 'object_index': disappeared_object_index,
                                     'ship_coord_index': linker_coord_index });
@@ -990,7 +992,26 @@ async function spawn(dirty, event_index, data) {
                         }
                     }
 
+                } 
+                // The 'interiors' will spawn off grid and be ships
+                else if(helper.notFalse(event_linkers[i].spawns_off_grid) && event_scope === 'planet' && event_linkers[i].object_type_id) {
+                    console.log("Spawns off grid on planet is being reused");
+                    let event_linker_object_type_index = main.getObjectTypeIndex(event_linkers[i].object_type_id);
+                    if(dirty.object_types[event_linker_object_type_index].is_ship) {
+                        console.log("Looks like we're on the ship interior");
+
+                        let disappeared_object_index = dirty.objects.findIndex(function(obj) { return obj && obj.object_type_id === event_linkers[i].object_type_id && 
+                            obj.spawned_event_id == dirty.spawned_events[reusing_spawned_event_index].id; });
+
+                        if(disappeared_object_index !== -1) {
+                            console.log("Found the ship interior. Setting it's planet id");
+                            dirty.objects[disappeared_object_index].planet_id = dirty.planets[planet_index].id;
+                            dirty.objects[disappeared_object_index].has_change = true;
+                        }
+                    }
                 }
+
+
 
             }
 
@@ -1108,7 +1129,8 @@ async function spawn(dirty, event_index, data) {
                                 await game_object.place(false, dirty, { 'object_index': new_object_index,
                                     'planet_coord_index': linker_coord_index });
     
-                                //console.log("Object's planet_coord_id: " + dirty.objects[new_object_index].planet_coord_id);
+                               
+
                             } else if(event_scope === 'ship') {
                                 await game_object.place(false, dirty, { 'object_index': new_object_index,
                                     'ship_coord_index': linker_coord_index });
@@ -1124,6 +1146,14 @@ async function spawn(dirty, event_index, data) {
     
                             if(debug_event_ids.indexOf(dirty.events[event_index].id) !== -1) {
                                 console.log("Skipped adding this linker to a coordinate. spawns_off_grid is true");
+                            }
+
+                             //console.log("Object's planet_coord_id: " + dirty.objects[new_object_index].planet_coord_id);
+                                //console.log("Object's planet_coord_id: " + dirty.objects[new_object_index].planet_coord_id);
+                            if(event_scope === 'planet' && dirty.object_types[event_linker_object_type_index].is_ship) {
+                                console.log("Planet event is spawning a ship. So this linker is a part of a portal type event");
+                                dirty.objects[new_object_index].planet_id = dirty.planets[planet_index].id;
+                                dirty.objects[new_object_index].has_change = true;
                             }
                             
                         }

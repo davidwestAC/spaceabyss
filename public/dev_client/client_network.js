@@ -2122,51 +2122,6 @@ socket.on('object_info', function(data) {
             socket.emit('request_elevator_linkers', { 'object_id': objects[object_index].id });
         }
 
-        /*
-        // If it's an object associated with a coord in our curent view, redraw that coord
-        if(current_view === "galaxy" && objects[object_index].coord_id) {
-
-            let coord_index = coords.findIndex(function(obj) { return obj && obj.id === objects[object_index].coord_id; });
-            if(coord_index !== -1) {
-                drawCoord('galaxy', coords[coord_index]);
-            }
-
-        } else if(current_view === "ship" && objects[object_index].ship_coord_id) {
-
-            let player_ship_coord_index = ship_coords.findIndex(function(obj) {
-                return obj && obj.id === players[client_player_index].ship_coord_id; });
-            let object_ship_coord_index = ship_coords.findIndex(function(obj) {
-                return obj && obj.id === objects[object_index].ship_coord_id; });
-
-            if(player_ship_coord_index !== -1 && object_ship_coord_index !== -1 &&
-                shouldDraw(ship_coords[player_ship_coord_index], ship_coords[object_ship_coord_index], 'on object_info')) {
-
-                drawCoord('ship', ship_coords[object_ship_coord_index]);
-            }
-        } else if(current_view === 'planet' && objects[object_index].planet_coord_id) {
-
-            let player_planet_coord_index = planet_coords.findIndex(function(obj) {
-                return obj && obj.id === players[client_player_index].planet_coord_id; });
-            let object_planet_coord_index = planet_coords.findIndex(function(obj) {
-                return obj && obj.id === objects[object_index].planet_coord_id; });
-
-            if(player_planet_coord_index !== -1 && object_planet_coord_index !== -1 &&
-                shouldDraw(planet_coords[player_planet_coord_index], planet_coords[object_planet_coord_index])) {
-
-                drawCoord('planet', planet_coords[object_planet_coord_index]);
-            }
-        }
-
-        else {
-            //console.log("Got object info id: " + objects[object_index].id + ". Our current view is: " + current_view +
-            //    " and the object's coord_id: " + objects[object_index].coord_id);
-        }
-
-        */
-
-
-
-
     }
     // Already have the object - don't have to insert, just update
     else {

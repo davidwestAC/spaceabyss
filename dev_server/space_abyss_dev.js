@@ -1941,6 +1941,7 @@ io.sockets.on('connection', function (socket) {
         await game.useElevator(socket, dirty, data.elevator_id);
     });
 
+    // TODO We're actually trusting the client a lot in this function. Just making the switch. I'd like to do more server checks on this.
     socket.on('view_change_data', async function (data) {
 
         try {
@@ -3278,6 +3279,9 @@ async function disconnectPlayer(socket) {
 
         }
 
+        let ship_index = await game_object.getIndex(dirty, dirty.players[player_index].ship_id);
+        let ship_type_index = getObjectTypeIndex(dirty.objects[ship_index].object_type_id);
+
         if(dirty.players[player_index].ship_coord_id) {
 
             let ship_coord_index = await getShipCoordIndex({ 'ship_coord_id': dirty.players[player_index].ship_coord_id });
@@ -3323,8 +3327,8 @@ async function disconnectPlayer(socket) {
 
                 // If the player is in a normal ship, we remove the normal ship from that coord as well
                 // However we don't remove the object if it's something that is larger (is_dockable)
-                let ship_index = await game_object.getIndex(dirty, dirty.players[player_index].ship_id);
-                let ship_type_index = getObjectTypeIndex(dirty.objects[ship_index].object_type_id);
+                
+                
 
                 if(!dirty.object_types[ship_type_index].is_dockable) {
                     await updateCoordGeneric(socket, {'coord_index': coord_index, 'object_id': false });
@@ -3347,6 +3351,16 @@ async function disconnectPlayer(socket) {
 
             //console.log("Set player's previous_coord_id to: " + dirty.players[player_index].previous_coord_id);
 
+        }
+
+        // Sometimes if people are in ship view, it seems like the ship isn't getting updated properly
+        if(!dirty.object_types[ship_type_index].is_dockable && dirty.objects[ship_index].coord_id) {
+            log(chalk.yellow("On disconnect, it doesn't look like the player's ship was removed properly"));
+            await game_object.removeFromCoord(dirty, ship_index);
+            dirty.objects[ship_index].coord_id = false;
+            dirty.objects[ship_index].coord_index = -1
+            dirty.objects[ship_index].has_change = true;
+            await game_object.sendInfo(false, "galaxy", dirty, ship_index);
         }
 
         //console.log("Sending updated player info to the room");

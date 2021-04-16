@@ -10,15 +10,14 @@ DOING NOW:
 
     Whenever I see a getPlanetCoordIndex, getShipCoordIndex, getCoordIndex, see if it's on a monster,object, or player, and switch it to TYPE.getCoordIndex()
 
-    If someone logs off in a ship, and you can see them, you can still attack their ship
 
-    AIs not applying in the ship portal areas on planets
+    Galaxy events aren't spawning? (or the frzon planet has one)
+
 
     Players building AIs on things like Asteroid Cities that will disapper
         (Possibly just disallow that? - or a VERY clear warning?)
 
         Okapi built AI on Asteroid City - plus an AI core and 2 ai batteries
-
 
     For server health, add in # of things players have galaxy wide (algae, moss, ai dust, batteries, etc)
 
@@ -34,8 +33,6 @@ DOING NOW:
 
     Lets add some stuff to the Frozen Planet
 
-
-    The shift key (I wish for a permanent keep-open button) does not keep the windows open when putting an item into the container, it also lags one action behind.
 
 
     I wouldn't hate players being able to drive through and explode salvagable stuff

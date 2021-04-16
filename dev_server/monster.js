@@ -1780,7 +1780,8 @@ async function move(dirty, i, data) {
                         if(dirty.objects[object_index].player_id) {
 
                             let player_object_type_index = main.getObjectTypeIndex(dirty.objects[object_index].object_type_id);
-                            if(!dirty.object_types[player_object_type_index].can_walk_on || dirty.object_types[player_object_type_index].can_have_rules) {
+                            if(!dirty.object_types[player_object_type_index].can_walk_on || dirty.object_types[player_object_type_index].can_have_rules &&
+                                dirty.object_types[player_object_type_index].id !== 63 && dirty.object_types[player_object_type_index].id !== 62) {
                                 console.log("A player built object is blocking the monster. The monster is now going to attack it");
 
                                 // remove the previous battle linker

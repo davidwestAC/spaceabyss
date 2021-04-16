@@ -896,7 +896,7 @@ const world = require('./world.js');
             if(dirty.monsters[monster_index].monster_type_id === 33 || dirty.monsters[monster_index].monster_type_id === 57) {
 
                 // If we are an AI Daemon, and the turn count is > 10, we attempt to spawn the next level of AI helper, the AI....
-                if(dirty.monster_types[monster_type_index].id === 33 && battle_linker.turn_count === 10) {
+                if(dirty.monster_types[monster_type_index].id === 33 && battle_linker.turn_count > 1 && battle_linker.turn_count % 10 === 0) {
                     log(chalk.cyan("AI is trying to advance attack/defense to the next level"));
 
                     // Monsters spawned by AI should have an object_id attached to them
@@ -1378,6 +1378,9 @@ const world = require('./world.js');
                 return false;
             }
 
+            console.log("Attacking object room: " + attacking_object_info.room);
+            console.log("Defending object room: " + defending_object_info.room);
+
             if(attacking_object_info.room !== defending_object_info.room) {
                 log(chalk.yellow("Objects don't share the same room"));
                 if(battle_linker) {
@@ -1793,6 +1796,8 @@ const world = require('./world.js');
             let object_attack_profile = await calculateObjectAttack(dirty, object_index);
             let attack = object_attack_profile.damage_amount;
             let defense = await player.calculateDefense(dirty, player_index);
+            
+            dirty.players[player_index].attacks_defended++;
 
             if(object_attack_profile.damage_amount <= defense) {
 
@@ -2376,6 +2381,7 @@ const world = require('./world.js');
 
             let ai_index = await world.getAIProtector(dirty, damage_amount, defending_player_info.coord, 'player', { 'player_index': defending_player_index });
 
+            console.log("AI index: " + ai_index);
         
 
             if(ai_index !== -1) {
