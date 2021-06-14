@@ -237,7 +237,11 @@ async function sendInfo(socket, room, dirty, data) {
 
         // we need to send things related to the planet. If there's a player, AI, AI rules
         if(dirty.planets[data.planet_index].player_id) {
-            await player.sendInfo(socket, room, dirty, dirty.planets[data.planet_index].player_id);
+            let planet_player_index = await player.getIndex(dirty, { 'player_id': dirty.planets[data.planet_index].player_id });
+            if(planet_player_index !== -1){
+                await player.sendInfo(socket, room, dirty, planet_player_index);
+            }
+            
         }
 
         // see if there is an AI on this planet

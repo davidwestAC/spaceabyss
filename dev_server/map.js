@@ -753,7 +753,11 @@ async function updateMapPlanet(socket, dirty) {
                     }
 
                     if(dirty.planet_coords[sending_coord_index].player_id) {
-                        await player.sendInfo(socket, false, dirty, dirty.planet_coords[sending_coord_index].player_id);
+                        let coord_player_index = await player.getIndex(dirty, { 'player_id': dirty.planet_coords[sending_coord_index].player_id });
+                        if(coord_player_index !== -1) {
+                            await player.sendInfo(socket, false, dirty, dirty.planet_coords[sending_coord_index].player_id);
+                        }
+                        
                     }
                 }
 
@@ -850,7 +854,11 @@ async function updateMapShip(socket, dirty) {
             }
 
             if(dirty.ship_coords[i].player_id) {
-                await player.sendInfo(socket, false, dirty, dirty.ship_coords[i].player_id);
+                let ship_coord_player_index = await player.getIndex(dirty, { 'player_id': dirty.ship_coords[i].player_id });
+                if(ship_coord_player_index !== -1) {
+                    await player.sendInfo(socket, false, dirty, ship_coord_player_index);
+                }
+                
             }
         }
     }

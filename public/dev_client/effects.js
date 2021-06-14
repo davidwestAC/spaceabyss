@@ -29,7 +29,7 @@ function addEffect(data) {
     if(!data.damage_types || (data.damage_types && data.damage_types.length <= 0)) {
         console.log("%c Trying to add an effect, but no damage types: ", log_warning);
         console.log(data);
-        console.trace();
+        //console.trace();
         return false;
     }
 
@@ -157,8 +157,13 @@ function addEffect(data) {
         } */ else if(data.damage_types[i] === 'energy') {
             new_texture_key = 'energy-effect';
             new_texture_animation_key = 'energy-effect-animation';
-            data.x += 32;
-            data.y += 32;
+
+            // Don't move down right if the energy effect is for a game object (like a ship)
+            if(typeof(data.object_id) === 'undefined') {
+                data.x += 32;
+                data.y += 32;
+            }
+            
         } else if(data.damage_types[i] === 'explosion') {
             new_texture_key = 'explosion-effect';
             new_texture_animation_key = 'explosion-effect-animation';

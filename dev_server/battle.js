@@ -453,8 +453,7 @@ const world = require('./world.js');
                     return;
                 }
 
-                await player.damage(dirty, { 'player_index': being_damaged_player_index,
-                    'damage_amount': data.damage_amount, 'damage_types': [ data.damage_type ] });
+                await player.damage(dirty, being_damaged_player_index, data.damage_amount, {'damage_types': [ data.damage_type ] });
             }
 
 
@@ -957,7 +956,7 @@ const world = require('./world.js');
                         'damage_types': sending_damage_types,
                         'calculating_range': calculating_range, 'flavor_text': flavor_text, 'additional_effect': monster_attack.additional_effect });
             } else {
-                await player.damage(dirty, { 'player_index': player_index, 'damage_amount': damage_amount,
+                await player.damage(dirty, player_index, damage_amount, {
                 'battle_linker': battle_linker, 'damage_types': [monster_attack.damage_type],
                 'calculating_range': calculating_range, 'flavor_text': flavor_text, 'damage_effect': monster_attack.damage_effect });
             }
@@ -1831,7 +1830,7 @@ const world = require('./world.js');
             }
 
 
-            await player.damage(dirty, { 'player_index': player_index, 'damage_amount': damage_amount,
+            await player.damage(dirty, player_index, damage_amount, {
                 'damage_types': object_attack_profile.damage_types,
                 'battle_linker': battle_linker, 'calculating_range': calculating_range });
 
@@ -2415,7 +2414,7 @@ const world = require('./world.js');
             }
 
 
-            await player.damage(dirty, { 'player_index': defending_player_index, 'damage_amount': damage_amount,
+            await player.damage(dirty, defending_player_index, damage_amount, {
                 'battle_linker': battle_linker, 'calculating_range': calculating_range });
 
             // Update the attacker

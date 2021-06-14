@@ -494,6 +494,9 @@ Take our player relationship linker and expand its functionality to have scenari
 Could stagger monster and object animation times based on their ID/index or something.
 
 
+It can have functionality - beds can be used to regenerate some health and energy quickly, eating at a chair+table can increase the length of food buffs
+
+
 
 Slaves on the slaver planet should be NPCs that could be liberated. Have a job of mining iron depoists, and actually have them interact with the iron deposists
 

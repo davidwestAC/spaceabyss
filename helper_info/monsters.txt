@@ -45,6 +45,7 @@ Slave (human)
 
 ***************** NULROM ************************
                 Burster
+                    Growing Abomination
 
 
 ***************** RUEL ************************
@@ -55,6 +56,7 @@ Slave (human)
             Slaver Guard
             Tortured Soul
                     Carver
+                    
                                 Slagcell Queen
 
 ***************** SLERM *************************
@@ -75,7 +77,14 @@ Slave (human)
                                     White Queen
                                         Absolution
 
-
+***************** VOON ************************
+    Voonita
+        Scrapslog
+            Transporter
+                Rottex
+                    Vooard
+                        Voon Mech
+                    
 
 ***************** VUEG ************************
 

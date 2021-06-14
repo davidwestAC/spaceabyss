@@ -16,15 +16,20 @@ Damage is per slot taken up (3 slots per arm)
 
 FREE/PASSIVE
 
-    TIER 1 - Territe, Batteries, Exoskeleton, Quick Matter (From Territe), AI Dust, Life Water (Complexity Tier: 4), Silk Fragment, Living Wood Fragment
+    TIER 1 - 
+    General Materials:Territe, Exoskeleton, Quick Matter (From Territe), AI Dust, Life Water (Complexity Tier: 4), Silk Fragment, Living Wood Fragment
     Energy Sources: Battery
+    Poison Materials:
     Minimum Monster Damage: 1
     Complexity: 1-4
     Damage (player weapons): Melee 1, Range 1
     Defense (player armor): 1
     Armor Types: Territe, Researching: 10/10
 
-        TIER 2 - Refined Territe, Batteries, Exoskeleton, Gold
+        TIER 2 - , Batteries, Exoskeleton, Gold
+        Materials: Refined Territe
+        Energy Sources:
+        Poison Materials: Poison Sac
         Minimum Monster Damage: 5
         Complexity: 6-9
         Damage: Melee 2, Range 1
@@ -39,6 +44,9 @@ FREE/PASSIVE
             Armor Types: Exodium, Living Wood, Slerm/(Bubble), Researching: 30/30
 
                 TIER 4 - Refined Exodium, Power Cells, AI Fragments (18), AI (22), Inferno Core, Jelly, Corrosive Goo
+                Building Materials: Refined Exodium
+                Poison Materials: Jelly
+                Corrosive Materials: Corrosive Goo
                 Minimum Monster Damage: 30
                 Complexity: 18-22
                 Damage: Melee 5, Range 3

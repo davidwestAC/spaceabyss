@@ -1861,7 +1861,11 @@ io.sockets.on('connection', function (socket) {
     socket.on("request_player_info", async function(data) {
         //console.log("in request_player_info function");
 
-        await player.sendInfo(socket, false, dirty, data.player_id);
+        let requested_player_index = await player.getIndex(dirty, { 'player_id': parseInt(data.player_id) });
+        if(requested_player_index !== -1) {
+            await player.sendInfo(socket, false, dirty, requested_player_index);
+        }
+        
 
     });
 
@@ -2680,7 +2684,7 @@ async function loginPlayer(socket, dirty, data) {
                         dirty.players[player_index].ship_coord_index = -1;
                         dirty.players[player_index].has_change = true;
                         await player.sendInfo(socket, "planet_" + dirty.planet_coords[planet_coord_index].planet_id,
-                            dirty, dirty.players[player_index].id);
+                            dirty, player_index);
                         placed_player = true;
     
                         // To dynamically load in just the monsters we initially need, the client is going to need to know
@@ -2736,9 +2740,9 @@ async function loginPlayer(socket, dirty, data) {
                         dirty.players[player_index].planet_coord_index = -1;
                         dirty.players[player_index].has_change = true;
     
-                        await player.sendInfo(socket, "ship_" + dirty.ship_coords[ship_coord_index].ship_id, dirty, dirty.players[player_index].id);
+                        await player.sendInfo(socket, "ship_" + dirty.ship_coords[ship_coord_index].ship_id, dirty, player_index);
                         await map.updateMap(socket, dirty);
-                        await player.sendInfo(socket, "ship_" + dirty.ship_coords[ship_coord_index].ship_id, dirty, dirty.players[player_index].id);
+                        await player.sendInfo(socket, "ship_" + dirty.ship_coords[ship_coord_index].ship_id, dirty, player_index);
     
                         console.log("Should have player at ship x,y: " + dirty.ship_coords[ship_coord_index].tile_x + "," +
                             dirty.ship_coords[ship_coord_index].tile_y);
@@ -2886,7 +2890,7 @@ async function loginPlayer(socket, dirty, data) {
                     'player_current_hp': socket.player_current_hp, 'player_max_hp': socket.player_max_hp, 'starting_view': starting_view });
     
             await game.sendPlayerStats(socket, dirty);
-            await player.sendInfo(socket, false, dirty, socket.player_id);
+            await player.sendInfo(socket, false, dirty, socket.player_index);
     
     
             //populate client inventory data
@@ -2919,7 +2923,7 @@ async function loginPlayer(socket, dirty, data) {
                 console.log("Gave player a body or a ship on login. Resending player stats and info");
                 let player_info = await player.getCoordAndRoom(dirty, player_index);
                 await game.sendPlayerStats(socket, dirty);
-                await player.sendInfo(socket, player_info.room, dirty, socket.player_id);
+                await player.sendInfo(socket, player_info.room, dirty, socket.player_index);
     
             }
     
@@ -3365,7 +3369,7 @@ async function disconnectPlayer(socket) {
 
         //console.log("Sending updated player info to the room");
 
-        await player.sendInfo(socket, player_info.room, dirty, dirty.players[player_index].id);
+        await player.sendInfo(socket, player_info.room, dirty, player_index);
         io.to(player_info.room).emit('logout_info', { 'player_id': dirty.players[player_index].id });
 
 

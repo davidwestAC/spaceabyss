@@ -4751,7 +4751,7 @@ async function skinRemove(socket, dirty, skin_object_type_id) {
         dirty.players[socket.player_index].skin_object_type_id = false;
         dirty.players[socket.player_index].has_change = true;
 
-        await player.sendInfo( socket, player_info.room, dirty, dirty.players[socket.player_index].id);
+        await player.sendInfo( socket, player_info.room, dirty, socket.player_index);
 
         console.log("Done in skin remove");
 
@@ -4784,7 +4784,7 @@ async function skinUse(socket, dirty, skin_object_type_id) {
         dirty.players[socket.player_index].skin_object_type_id = skin_object_type_id;
         dirty.players[socket.player_index].has_change = true;
 
-        await player.sendInfo( socket, player_info.room, dirty, dirty.players[socket.player_index].id);
+        await player.sendInfo( socket, player_info.room, dirty, socket.player_index);
 
     } catch (error) {
         log(chalk.red("Error in world.skinUse: " + error));

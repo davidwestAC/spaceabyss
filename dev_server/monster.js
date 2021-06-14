@@ -824,21 +824,21 @@ async function deleteMonster(dirty, monster_index, data = {}) {
         }
 
         if(check_spawned_event_id !== 0 && typeof data.skip_check_spawned_event === 'undefined') {
-            console.log("Monster was part of a spawned event");
+            //console.log("Monster was part of a spawned event");
 
             let spawned_event_index = dirty.spawned_events.findIndex(function(obj) { return obj && obj.id === check_spawned_event_id; });
             if(spawned_event_index !== -1 && planet_index !== -1) {
-                console.log("Have the information we need to see if we modify the regular monster count");
+                //console.log("Have the information we need to see if we modify the regular monster count");
                 // We need to get the planet event linker to see if this was a regular monster spawn
                 let planet_event_linker_index = dirty.planet_event_linkers.findIndex(function(obj) { return obj && 
                     obj.event_id === dirty.spawned_events[spawned_event_index].event_id && obj.planet_type_id === dirty.planets[planet_index].planet_type_id; });
 
                 if(planet_event_linker_index !== -1 && dirty.planet_event_linkers[planet_event_linker_index].is_regular_monster_spawn) {
                     dirty.planets[planet_index].current_regular_monster_count--;
-                    console.log("Reduced the current regular monster count on planet to: " + dirty.planets[planet_index].current_regular_monster_count);
+                    //console.log("Reduced the current regular monster count on planet to: " + dirty.planets[planet_index].current_regular_monster_count);
 
                 } else {
-                    console.log("Did not reduce planet's regular monster count");
+                    //console.log("Did not reduce planet's regular monster count");
                 }
             }
 

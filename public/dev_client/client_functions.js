@@ -921,7 +921,7 @@ function createNpcSprite(npc_index) {
 
 
 function createPlayerSprite(player_index) {
-    //console.log("In createPlayerSprite for player " + players[player_index].name);
+    console.log("In createPlayerSprite for player " + players[player_index].name);
     //console.trace();
 
     if (typeof player_index === 'undefined' || player_index === -1) {
@@ -1105,11 +1105,21 @@ function createPlayerSprite(player_index) {
                 return false;
             }
 
+            // ACID
+            if (objects[body_index].object_type_id === 454) {
+                new_texture_key = 'player-acid';
+                new_texture_animation_key = 'player-acid-idle-animation';
+            } 
             // HUMAN
-            if (objects[body_index].object_type_id === 110) {
+            else if (objects[body_index].object_type_id === 110) {
                 new_texture_key = 'player-human';
                 new_texture_animation_key = 'player-human-idle-animation';
                 new_sprite_y_offset = -6;
+            }
+            // INFERNO
+            else if (objects[body_index].object_type_id === 453) {
+                new_texture_key = 'player-inferno';
+                new_texture_animation_key = 'player-inferno-idle-animation';
             }
             // MANUFACTURING
             else if (objects[body_index].object_type_id === 219) {
@@ -1170,14 +1180,17 @@ function createPlayerSprite(player_index) {
 
     // We get to create it
     if (!players[player_index].sprite) {
+        console.log("Need to create sprite for player " + players[player_index].name);
 
         let player_info = getPlayerInfo(player_index);
 
         if (player_info.coord) {
+            console.log("Player has coord");
 
             if(scene_game.textures.exists(new_texture_key)) {
 
                 players[player_index].sprite = scene_game.add.sprite(-1000, -1000, new_texture_key);
+                console.log("Created and added new sprite to player");
 
                 players[player_index].sprite.anims.play(new_texture_animation_key);
     
@@ -1265,7 +1278,7 @@ function createPlayerSprite(player_index) {
  
             
         } else {
-            //console.log("%c No idea where to put player sprite for player id: " + players[player_index].id + "!", log_warning);
+            console.log("%c No idea where to put player sprite for player id: " + players[player_index].name + "!", log_warning);
             //console.log("Player id: " + players[player_index].id + " coord_id: " + players[player_index].coord_id + 
             //" ship_coord_id: " + players[player_index].ship_coord_id + " planet_coord_id: " + players[player_index].planet_coord_id);
         
@@ -1275,6 +1288,7 @@ function createPlayerSprite(player_index) {
     }
     // Just a switch!
     else if (players[player_index].sprite.texture.key !== new_texture_key) {
+        console.log("Switching texture");
 
         if(scene_game.textures.exists(new_texture_key)) {
             //console.log("Switching texture for player id: " + players[player_index].id);
@@ -2565,7 +2579,7 @@ function generatePlayerInfoDisplay() {
     // MANUFACTURING
     html_string += "Manufacturing: " + players[client_player_index].manufacturing_skill_points;
     // lets start doing some client side level stuff just to see how it shows
-    let manufacturing_level = 1 + Math.floor(difficult_level_modifier * Math.sqrt(players[client_player_index].manufacturing_skill_points));
+    let manufacturing_level = getPlayerLevel('manufacturing');
 
     html_string += " Level: " + manufacturing_level;
 
@@ -3144,6 +3158,12 @@ function generateSpaceportDisplay() {
         //console.log("Emptied launch in generateSpaceportDisplay");
         $('#launch').empty();
     }
+}
+
+function getRaceEatingLinkerIndex(race_id, object_type_id) {
+
+    return race_eating_linkers.findIndex(function(obj) { return obj && obj.race_id === race_id &&
+        obj.object_type_id === object_type_id; });
 }
 
 function getRandomIntInclusive(min, max) {
@@ -3754,6 +3774,7 @@ function printAssemblyList(assembling_object = false, coord = false) {
         sel_click_menu.append(html_string);
 
     }
+    // Object isn't already assembling something
     else {
 
 
@@ -3770,7 +3791,7 @@ function printAssemblyList(assembling_object = false, coord = false) {
 
 
 
-        html_string += "<div class='message is-info'><div class='message-header'>Things You Can Assemble</div>";
+        html_string += "<div class='message is-info'><div class='message-header'>Things You Can Assemble</div><div>";
 
         object_types.forEach(function (object_type) {
 
@@ -3893,7 +3914,7 @@ function printAssemblyList(assembling_object = false, coord = false) {
 
 
 
-        html_string += "</div>";
+        html_string += "</div></div>";
 
         sel_click_menu.append(html_string);
 
@@ -3964,11 +3985,11 @@ function printAssemblyList(assembling_object = false, coord = false) {
 
                     } else {
                         research_requirement_met = false;
-                        failure_reason = "Requires more " + object_types[required_object_index].name + " Research";
+                        failure_reason = "<br>Research " + object_types[required_object_index].name;
                     }
                 } else {
                     research_requirement_met = false;
-                    failure_reason = "Requires " + object_types[required_object_index].name + " Research";
+                    failure_reason = "<br>Research " + object_types[required_object_index].name;
                 }
             }
 
@@ -3985,7 +4006,7 @@ function printAssemblyList(assembling_object = false, coord = false) {
 
 
 
-        html_string += "</div>";
+        html_string += "</div></div>";
 
         sel_click_menu.append(html_string);
 
@@ -4205,15 +4226,32 @@ function generateAiManagementDisplay(object_index = -1) {
 function generateAssemblyListItem(object_type, object_assembly_linkers, assembling_object = false, can_assemble = true, failure_reason = false) {
 
 
-    let manufacturing_level = 1 + Math.floor(difficult_level_modifier * Math.sqrt(players[client_player_index].manufacturing_skill_points));
+    let manufacturing_level = getPlayerLevel('manufacturing');
+    let difficulty = "easy";
+    if(object_type.complexity > manufacturing_level + 10) {
+        difficulty = "impossible";
+    } else if(object_type.complexity > manufacturing_level) {
+        difficulty = "wasteful";
+    }
 
     let html_string = "";
-    html_string += "<table class='assemble'><tr><td><div class='center'><strong>" + object_type.name + "</strong>";
+    html_string += "<div class='assembly-item'";
+    
+    if(difficulty === "easy") {
+        html_string += " style='box-shadow: 0px 0px 3px #315e1b; background-color: #f3ffed;' ";
+    } else if(difficulty === "wasteful") {
+        html_string += " style='box-shadow: 0px 0px 3px #8e8034; background-color: #fff8dd;' ";
+    } else if(difficulty === "impossible" ) {
+        html_string += " style='box-shadow: 0px 0px 3px #bf0000; background-color: #ffebeb;' ";
+    }
+
+    html_string += "><div><strong>" + object_type.name + "</strong>";
 
     if(object_type.complexity > manufacturing_level + 10) {
+        can_assemble = false;
         html_string += " <span class='tag is-danger' style='padding:2px; line-height:1; height: 1.4em;'>Too Complex</span>";
     } else if(object_type.complexity > manufacturing_level) {
-        html_string += " <span class='tag is-warning' style='padding:2px; line-height:1; height: 1.4em;'>Hard</span>";
+        html_string += " <span class='tag is-warning' style='padding:2px; line-height:1; height: 1.4em;'>Wasteful</span>";
     } else {
         html_string += " <span class='tag is-success' style='padding:2px; line-height:1; height: 1.4em;'>Easy</span>";
     }
@@ -4230,7 +4268,18 @@ function generateAssemblyListItem(object_type, object_assembly_linkers, assembli
 
             let required_object_type_index = object_types.findIndex(function (obj) { return obj && obj.id === assembly_linker.object_type_id; });
 
-            html_string += "<br> " + assembly_linker.amount + " ";
+            let amount_needed = assembly_linker.amount;
+            if(manufacturing_level < object_type.complexity && can_assemble) {
+                let level_difference = object_type.complexity - manufacturing_level;
+                amount_needed = assembly_linker.amount + Math.ceil((assembly_linker.amount / (10 - level_difference)) * 3);
+
+                let difference_in_amount_needed = amount_needed - assembly_linker.amount;
+                html_string += "<br> " + assembly_linker.amount + " +" + difference_in_amount_needed + " ";
+            } else {
+                html_string += "<br> " + amount_needed + " ";
+
+            }
+
             if (required_object_type_index !== -1) {
                 html_string += object_types[required_object_type_index].name + " <a target='_blank' href='https://space.alphacoders.com/object-type/view/" + 
                 object_types[required_object_type_index].id + "'><img style='width:16px; height:16px;' src='https://space.alphacoders.com/images/" +
@@ -4247,11 +4296,12 @@ function generateAssemblyListItem(object_type, object_assembly_linkers, assembli
         });
     }
 
-
+    //html_string += "</div>";
 
     if (can_assemble) {
 
-        html_string += "<div class='center'>Assemble: ";
+        //html_string += "<div class='center'>";
+        html_string += "<br>";
 
         if (assembling_object === false || ( assembling_object.object_type_id !== 116 && assembling_object.object_type_id !== 435 && assembling_object.object_type_id !== 436 )) {
             html_string += " <button id='assemble_" + object_type.id + "_all' class='button is-default is-small' ";
@@ -4290,14 +4340,14 @@ function generateAssemblyListItem(object_type, object_assembly_linkers, assembli
             html_string += " amount='1'>Assemble</button>";
         }
 
-        html_string += "</div>";
+        //html_string += "</div>";
 
 
     }
 
 
 
-    html_string += "</td></tr></table>";
+    html_string += "</div></div>";
 
     return html_string;
 }
@@ -4563,6 +4613,11 @@ function generateEquipmentDisplay() {
             if (object_types[object_type_index].defense) {
                 equipment_linker_string += " + " + object_types[object_type_index].defense + " defense";
             }
+
+            if(object_types[object_type_index].manufacturing_modifier) {
+                equipment_linker_string += " + " + object_types[object_type_index].manufacturing_modifier + " manufacturing";
+            }
+
             equipment_linker_string += " )";
             equipment_linker_string += "<button class='button is-warning is-small' id='unequip_" + equipment_linker.id +
                 "' equipment_linker_id='" + equipment_linker.id + "'>Unequip</button>";
@@ -7141,7 +7196,7 @@ monster_sprites.push({ 'key': 'acid-fiend',             'monster_type_id': 74, '
 monster_sprites.push({ 'key': 'acid-fly',               'monster_type_id': 70, 'planet_type_id': 15, 'frame_width': 64, 'frame_height': 64, 'frame_count': 6, 'frame_rate': 12 });
 monster_sprites.push({ 'key': 'algae-king',             'monster_type_id': 113, 'planet_type_id': 16, 'frame_width': 64, 'frame_height': 64, 'frame_count': 4, 'frame_rate': 8 });
 monster_sprites.push({ 'key': 'alphablue',              'monster_type_id': 145, 'frame_width': 126, 'frame_height': 128, 'frame_count': 10, 'frame_rate': 18 });
-monster_sprites.push({ 'key': 'beetle-knight',          'monster_type_id': 148, 'frame_width': 64, 'frame_height': 64, 'frame_count': 1, 'frame_rate': 8 });
+monster_sprites.push({ 'key': 'beetle-knight',          'monster_type_id': 148, 'frame_width': 96, 'frame_height': 96, 'frame_count': 7, 'frame_rate': 8 });
 monster_sprites.push({ 'key': 'bionic-crab',            'monster_type_id': 105, 'planet_type_id': 34, 'frame_width': 64, 'frame_height': 64, 'frame_count': 9, 'frame_rate': 8 });
 monster_sprites.push({ 'key': 'bloomer',                'monster_type_id': 133, 'frame_width': 64, 'frame_height': 72, 'frame_count': 4, 'frame_rate': 8 });
 monster_sprites.push({ 'key': 'blossomtis',             'monster_type_id': 116, 'planet_type_id': 29, 'frame_width': 68, 'frame_height': 68, 'frame_count': 6, 'frame_rate': 8 });
@@ -7165,6 +7220,7 @@ monster_sprites.push({ 'key': 'jellyfish',              'monster_type_id': 108, 
 monster_sprites.push({ 'key': 'mini-walker',            'monster_type_id': 149, 'frame_width': 82, 'frame_height': 88, 'frame_count': 10, 'frame_rate': 8 });
 monster_sprites.push({ 'key': 'primewall',              'monster_type_id': 134, 'frame_width': 160, 'frame_height': 122, 'frame_count': 13, 'frame_rate': 8 });
 monster_sprites.push({ 'key': 'observer',               'monster_type_id': 121, 'ship_type_id': 351, 'frame_width': 64, 'frame_height': 64, 'frame_count': 5, 'frame_rate': 6 });
+monster_sprites.push({ 'key': 'rottex',                 'monster_type_id': 91, 'frame_width': 96, 'frame_height': 96, 'frame_count': 7, 'frame_rate': 8 });
 monster_sprites.push({ 'key': 'sea-urchin',             'monster_type_id': 106, 'planet_type_id': 34, 'frame_width': 64, 'frame_height': 64, 'frame_count': 12, 'frame_rate': 8 });
 monster_sprites.push({ 'key': 'servant',                'monster_type_id': 152, 'frame_width': 110, 'frame_height': 106, 'frame_count': 8, 'frame_rate': 8 });
 monster_sprites.push({ 'key': 'take-out-drone',         'monster_type_id': 119, 'planet_type_id': 30, 'frame_width': 64, 'frame_height': 64, 'frame_count': 24, 'frame_rate': 8 });
@@ -7496,7 +7552,18 @@ function loadPlayerSprites(object_type_id) {
 
     console.log("In loadPlayerSprites");
 
+    // ACID BODY
+    if(object_type_id === 454) {
 
+        let scene_game = game.scene.getScene('sceneGame');
+
+        if(!scene_game.textures.exists('player-acid')) {
+            scene_game.load.on('filecomplete', processPlayerFile, this);
+            scene_game.load.spritesheet('player-acid', "https://space.alphacoders.com/images/acid-body-animated.png",
+                { frameWidth: 64, frame_height: 66, endFrame: 30 });
+            scene_game.load.start();
+        }
+    } 
     // DESTROYER
     if(object_type_id === 271) {
 
@@ -7521,6 +7588,18 @@ function loadPlayerSprites(object_type_id) {
             scene_game.load.start();
         }
     }
+    // INFERNO BODY
+    else if(object_type_id === 453) {
+
+        let scene_game = game.scene.getScene('sceneGame');
+
+        if(!scene_game.textures.exists('player-inferno')) {
+            scene_game.load.on('filecomplete', processPlayerFile, this);
+            scene_game.load.spritesheet('player-inferno', "https://space.alphacoders.com/images/inferno-body-animated.png",
+                { frameWidth: 64, frame_height: 68, endFrame: 30 });
+            scene_game.load.start();
+        }
+    } 
     // RESEARCHING BODY
     else if(object_type_id === 411) {
 
@@ -7635,8 +7714,61 @@ function processPlayerFile(key, type, texture) {
     let loaded_type = "";
 
 
+    // ACID 
+    if(key === 'player-acid') {
+
+        console.log("Processing acid body");
+        loaded_object_type_id = 454;
+        loaded_type = "body";
+
+
+        let player_acid_idle_config = {
+            key: 'player-acid-idle-animation',
+            frames: scene_game.anims.generateFrameNumbers('player-acid', { start: 0, end: 5, first: 5 }),
+            frameRate: 4,
+            repeat: -1
+        };
+        scene_game.anims.create(player_acid_idle_config);
+
+
+        let player_acid_left_config = {
+            key: 'player-acid-left-animation',
+            frames: scene_game.anims.generateFrameNumbers('player-acid', { start: 6, end: 11, first: 11 }),
+            frameRate: 4,
+            repeat: -1
+        };
+
+        scene_game.anims.create(player_acid_left_config);
+
+        let player_acid_right_config = {
+            key: 'player-acid-right-animation',
+            frames: scene_game.anims.generateFrameNumbers('player-acid', { start: 12, end: 17, first: 17 }),
+            frameRate: 4,
+            repeat: -1
+        };
+        scene_game.anims.create(player_acid_right_config);
+
+        let player_acid_up_config = {
+            key: 'player-acid-up-animation',
+            frames: scene_game.anims.generateFrameNumbers('player-acid', { start: 18, end: 23, first: 23 }),
+            frameRate: 4,
+            repeat: -1
+        };
+
+        scene_game.anims.create(player_acid_up_config);
+
+        let player_acid_down_config = {
+            key: 'player-acid-down-animation',
+            frames: scene_game.anims.generateFrameNumbers('player-acid', { start: 24, end: 29, first: 29 }),
+            frameRate: 4,
+            repeat: -1
+        };
+        scene_game.anims.create(player_acid_down_config);
+
+
+    } 
     // DESTROYER
-    if(key === 'player-destroyer') {
+    else if(key === 'player-destroyer') {
         loaded_object_type_id = 271;
         loaded_type = "ship";
 
@@ -7692,6 +7824,59 @@ function processPlayerFile(key, type, texture) {
         };
         scene_game.anims.create(player_garden_ship_config);
     }
+    // INFERNO 
+    if(key === 'player-inferno') {
+
+        console.log("Processing inferno body");
+        loaded_object_type_id = 453;
+        loaded_type = "body";
+
+
+        let player_inferno_idle_config = {
+            key: 'player-inferno-idle-animation',
+            frames: scene_game.anims.generateFrameNumbers('player-inferno', { start: 0, end: 5, first: 5 }),
+            frameRate: 4,
+            repeat: -1
+        };
+        scene_game.anims.create(player_inferno_idle_config);
+
+
+        let player_inferno_left_config = {
+            key: 'player-inferno-left-animation',
+            frames: scene_game.anims.generateFrameNumbers('player-inferno', { start: 6, end: 11, first: 11 }),
+            frameRate: 4,
+            repeat: -1
+        };
+
+        scene_game.anims.create(player_inferno_left_config);
+
+        let player_inferno_right_config = {
+            key: 'player-inferno-right-animation',
+            frames: scene_game.anims.generateFrameNumbers('player-inferno', { start: 12, end: 17, first: 17 }),
+            frameRate: 4,
+            repeat: -1
+        };
+        scene_game.anims.create(player_inferno_right_config);
+
+        let player_inferno_up_config = {
+            key: 'player-inferno-up-animation',
+            frames: scene_game.anims.generateFrameNumbers('player-inferno', { start: 18, end: 23, first: 23 }),
+            frameRate: 4,
+            repeat: -1
+        };
+
+        scene_game.anims.create(player_inferno_up_config);
+
+        let player_inferno_down_config = {
+            key: 'player-inferno-down-animation',
+            frames: scene_game.anims.generateFrameNumbers('player-inferno', { start: 24, end: 29, first: 29 }),
+            frameRate: 4,
+            repeat: -1
+        };
+        scene_game.anims.create(player_inferno_down_config);
+
+
+    } 
     // RESEARCHING
     else if(key === 'player-researching') {
 
@@ -8049,9 +8234,39 @@ function initiateMovePlayerFlow(player_index, destination_coord_type, destinatio
     if (players[player_index].sprite) {
 
 
+        /********** ACID *************/
+        if (players[player_index].sprite.texture.key === 'player-acid') {
 
+            // LEFT !
+            if (players[player_index].destination_x < players[player_index].sprite.x) {
+
+                if (players[player_index].sprite.anims.getCurrentKey() !== 'player-acid-left-animation') {
+                    players[player_index].sprite.anims.play('player-acid-left-animation');
+                }
+
+            }
+            // RIGHT!
+            else if (players[player_index].destination_x > players[player_index].sprite.x) {
+                if (players[player_index].sprite.anims.getCurrentKey() !== 'player-acid-right-animation') {
+                    players[player_index].sprite.anims.play('player-acid-right-animation');
+                }
+
+            }
+            // UP!
+            else if (players[player_index].destination_y < players[player_index].sprite.y) {
+                if (players[player_index].sprite.anims.getCurrentKey() !== 'player-acid-up-animation') {
+                    players[player_index].sprite.anims.play('player-acid-up-animation');
+                }
+            }
+            // DOWN!
+            else if (players[player_index].destination_y > players[player_index].sprite.y) {
+                if (players[player_index].sprite.anims.getCurrentKey() !== 'player-acid-down-animation') {
+                    players[player_index].sprite.anims.play('player-acid-down-animation');
+                }
+            }
+        }
         /***************** BLOCKADE RUNNER ******************/
-        if (players[player_index].sprite.texture.key === 'player-blockade-runner') {
+        else if (players[player_index].sprite.texture.key === 'player-blockade-runner') {
 
             // LEFT !
             if (players[player_index].destination_x < players[player_index].sprite.x) {
@@ -8274,7 +8489,37 @@ function initiateMovePlayerFlow(player_index, destination_coord_type, destinatio
                 }
             }
         }
+        /********** INFERNO *************/
+        else if (players[player_index].sprite.texture.key === 'player-inferno') {
 
+            // LEFT !
+            if (players[player_index].destination_x < players[player_index].sprite.x) {
+
+                if (players[player_index].sprite.anims.getCurrentKey() !== 'player-inferno-left-animation') {
+                    players[player_index].sprite.anims.play('player-inferno-left-animation');
+                }
+
+            }
+            // RIGHT!
+            else if (players[player_index].destination_x > players[player_index].sprite.x) {
+                if (players[player_index].sprite.anims.getCurrentKey() !== 'player-inferno-right-animation') {
+                    players[player_index].sprite.anims.play('player-inferno-right-animation');
+                }
+
+            }
+            // UP!
+            else if (players[player_index].destination_y < players[player_index].sprite.y) {
+                if (players[player_index].sprite.anims.getCurrentKey() !== 'player-inferno-up-animation') {
+                    players[player_index].sprite.anims.play('player-inferno-up-animation');
+                }
+            }
+            // DOWN!
+            else if (players[player_index].destination_y > players[player_index].sprite.y) {
+                if (players[player_index].sprite.anims.getCurrentKey() !== 'player-inferno-down-animation') {
+                    players[player_index].sprite.anims.play('player-inferno-down-animation');
+                }
+            }
+        }
         /************ LANCER *******************/
         else if (players[player_index].sprite.texture.key === 'player-lancer') {
 
@@ -8707,6 +8952,7 @@ function movePlayerInstant(player_index, x, y) {
     }
 
     if (!players[player_index].sprite) {
+        console.log("Returning false in movePlayerInstant. Still no sprite somehow");
         return false;
     }
 
@@ -8722,32 +8968,6 @@ function movePlayerInstant(player_index, x, y) {
     }
 
     //console.log("Moved player sprite to: " + x + "," + y);
-
-    /*
-    // Don't advance the animation, just pop the player to where we are saying!
-    let animation_index = animations.findIndex(function(obj) { return obj && obj.player_id === moving_player.id; });
-    if(animation_index !== -1) {
-        let player_object_type_index = getPlayerObjectTypeIndex(moving_player);
-        if(player_object_type_index !== -1) {
-            let drawing_game_index = object_types[player_object_type_index].game_file_index + (animations[animation_index].current_frame - 1);
-            let tile_x = pixelToTileX(x);
-            let tile_y = pixelToTileY(y);
-            //console.log("Drawing player at " + tile_x + "," + tile_y + " in movePlayerInstant");
-
-            // We are trying different combinations of moving/centering the camera to try and fix visual glitches
-            if(moving_player.id === player_id) {
-                //console.log("function movePlayerInstant centering camera at tile_x,tile_y: " + tile_x + "," + tile_y);
-                camera.centerOn(tileToPixel(tile_x), tileToPixel(tile_y));
-            }
-            map.putTileAt(drawing_game_index, tile_x, tile_y, false, 'layer_being');
-
-
-
-        }
-
-
-    }
-    */
 
     redrawBars();
     return;
@@ -10479,7 +10699,7 @@ function showClickMenuNpc(coord) {
 }
 
 function showClickMenuObject(coord) {
-    console.log("in showClickMenuObject");
+    //console.log("in showClickMenuObject");
     let attack_object_shown = false;
     let object_index = -1;
 
@@ -11851,6 +12071,8 @@ function updatePlayer(data, player_index) {
 
     if (current_view === 'planet') {
 
+        console.log("We're on a planet and the other player's planet coord id: " + data.player.planet_coord_id);
+
         // We're on a planet and they aren't
         if (!data.player.planet_coord_id || data.player.planet_coord_id === 0) {
             destroyPlayerSprite(players[player_index]);
@@ -11864,16 +12086,34 @@ function updatePlayer(data, player_index) {
             if (coord_index !== -1 && shouldDraw(client_player_info.coord, planet_coords[coord_index])) {
                 // If they don't have a sprite, insta move them there
                 if (!players[player_index].sprite) {
+                    console.log("no sprite. Lets set the planet coord id and create the player sprite!");
                     players[player_index].planet_coord_id = data.player.planet_coord_id;
+
+                    // For something like a move from a portal, we'll still potentially have a ship coord id 
+                    // set on the player right now, not yet updated from data.
+                    // Our getPlayerInfo function checks for a ship_coord_id before it checks
+                    // for a planet coord id
+                    if(players[player_index].ship_coord_id) {
+                        players[player_index].ship_coord_id = data.player.ship_coord_id;
+                    }
                     updated_planet_coord_id = true;
                     createPlayerSprite(player_index);
 
+                    console.log("After createPlayerSprite");
+                    if(players[player_index].sprite) {
+                        console.log("Player has a sprite now");
+                    } else {
+                        console.log("Still don't have player sprite");
+                    }
+
                     movePlayerInstant(player_index, planet_coords[coord_index].tile_x * tile_size + tile_size / 2,
                         planet_coords[coord_index].tile_y * tile_size + tile_size / 2);
+
+                    console.log("Should have moved player " + players[player_index].name + "to planet coord " + planet_coords[coord_index].id);
                 }
                 // Otherwise, flow them there
                 else if (data.player.planet_coord_id !== players[player_index].planet_coord_id) {
-                    //console.log("Other player: " + players[player_index].name + " moved to planet coord id: " + data.player.planet_coord_id);
+                    console.log("We already have the sprite for this other player");
                     players[player_index].planet_coord_id = data.player.planet_coord_id;
                     updated_planet_coord_id = true;
                     initiateMovePlayerFlow(player_index, 'planet', planet_coords[coord_index], 'updatePlayer > planet');
@@ -11984,6 +12224,12 @@ function updatePlayer(data, player_index) {
                         objects[old_body_index].name_text.setDepth(11);
                     }
                 }
+            }
+            // Our client doesn't have the coord where the player is, or the player moved somewhere out of drawing range
+            else if (coord_index === -1 || !shouldDraw(client_player_info.coord, ship_coords[coord_index])) {
+                destroyPlayerSprite(players[player_index]);
+                players[player_index].destination_x = false;
+                players[player_index].destination_y = false;
             }
 
 

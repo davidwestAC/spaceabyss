@@ -79,13 +79,7 @@ Content Within:
     Idea: Lots of energy/battiers/power cells
 
 
-Tentacles
-Type: Monster
-Sprite Status: I've drawn a basic, usable sprite
 
-Bloomer
-Type: Monster
-Sprite Status: None
 
 Dredge
 Type: Machine
@@ -140,17 +134,11 @@ Size: 18x18 max
 Frames Needed: 1 design
 Notes: We did a Keratin armor set in batch #24. I need just a small sprite of a piece of Keratin. 
 
-Beetle Knight
 
-Voon Mech
 
 Nulrom Beacon
 
-Growing Abomination
-
-Voon Vial
-
-Nulrom Egg Sack
+Nulrom Egg Sack (Just use one of my egg images?)
 
 Rain Floor
 Type: Animated Floor/Weather Effect
@@ -174,11 +162,6 @@ Lava Flow Floor
 ** THINGS I'M SENDING DIOPHAMTO'S WAY **
 ***************************************
 
-1. Bio Rifle
-Type: Player Weapon
-Size: 32x32 max
-Frames Needed: 1 design
-Reference Image: https://images.gemquery.com/263/content_2638870.jpg
 
 
 1. Crystal

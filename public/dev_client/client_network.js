@@ -2491,13 +2491,17 @@ socket.on('planet_coord_info', function (data) {
         // We are just adding a planet coord that another player is on
         else if(planet_coords[coord_index].player_id) {
 
-            console.log("Got a planet coord with a different player on it");
+            console.log("Got a planet coord with a different player id: " + planet_coords[coord_index].player_id + " on it");
 
             let other_player_index = getPlayerIndex(planet_coords[coord_index].player_id);
             if(other_player_index !== -1) {
                 let update_player_data = {};
                 update_player_data.player = players[other_player_index];
+                console.log("Manually calling updatePlayer");
                 updatePlayer(update_player_data, other_player_index);
+            } else {
+                console.log("Don't have this player in data. Requesting");
+                socket.emit('request_player_info', { 'player_id': planet_coords[coord_index].player_id });
             }
 
         }
@@ -2697,6 +2701,7 @@ socket.on('player_info', function(data) {
 
     if(!data.player) {
         console.log("%c Received player info without a player", log_warning);
+        console.log(data);
         return false;
     }
 
@@ -2734,7 +2739,7 @@ socket.on('player_info', function(data) {
             //console.log("Calling updatePlayerClient");
             updatePlayerClient(data);
         } else {
-            //console.log("Calling updatePlayer");
+            console.log("Calling updatePlayer for player id: " + data.player.id);
             updatePlayer(data, player_index);
         }
 

@@ -445,8 +445,8 @@ async function dockOnShip(socket, dirty, object_id) {
         dirty.players[player_index].ship_coord_id = dirty.ship_coords[ship_coord_index].id;
         dirty.players[player_index].ship_coord_index = ship_coord_index;
         dirty.players[player_index].has_change = true;
-        await player.sendInfo(socket, "ship_" + dirty.ship_coords[ship_coord_index].ship_id, dirty, dirty.players[player_index].id);
-        await player.sendInfo(false, "galaxy", dirty, dirty.players[player_index].id);
+        await player.sendInfo(socket, "ship_" + dirty.ship_coords[ship_coord_index].ship_id, dirty, player_index);
+        await player.sendInfo(false, "galaxy", dirty, player_index);
 
         socket.leave("galaxy");
         socket.join("ship_" + dirty.ship_coords[ship_coord_index].ship_id);
@@ -995,7 +995,7 @@ exports.move = move;
                 dirty.players[socket.player_index].coord_id = dirty.coords[coord_index].id;
                 dirty.players[socket.player_index].coord_index = coord_index;
                 dirty.players[socket.player_index].has_change = true;
-                await player.sendInfo(socket, "galaxy", dirty, dirty.players[socket.player_index].id);
+                await player.sendInfo(socket, "galaxy", dirty, socket.player_index);
 
                 dirty.objects[ship_index].coord_id = dirty.coords[coord_index].id;
                 dirty.objects[ship_index].coord_index = coord_index;
@@ -1077,7 +1077,7 @@ exports.move = move;
             dirty.players[socket.player_index].coord_index = coord_index;
             dirty.players[socket.player_index].has_change = true;
 
-            await player.sendInfo(socket, "galaxy", dirty, dirty.players[socket.player_index].id);
+            await player.sendInfo(socket, "galaxy", dirty, socket.player_index);
 
             dirty.objects[ship_index].coord_id = dirty.coords[coord_index].id;
             dirty.objects[ship_index].coord_index = coord_index;
@@ -1482,7 +1482,7 @@ exports.move = move;
                 dirty.players[socket.player_index].coord_id = dirty.coords[coord_index].id;
                 dirty.players[socket.player_index].coord_index = coord_index;
                 dirty.players[socket.player_index].has_change = true;
-                await player.sendInfo(socket, "galaxy", dirty, dirty.players[socket.player_index].id);
+                await player.sendInfo(socket, "galaxy", dirty, socket.player_index);
 
                 dirty.objects[player_ship_index].coord_id = dirty.coords[coord_index].id;
                 dirty.objects[player_ship_index].coord_index = coord_index;
@@ -1553,7 +1553,7 @@ exports.move = move;
             dirty.players[socket.player_index].coor_index = coord_index;
             dirty.players[socket.player_index].has_change = true;
 
-            await player.sendInfo(socket, "galaxy", dirty, dirty.players[socket.player_index].id);
+            await player.sendInfo(socket, "galaxy", dirty, socket.player_index);
 
             dirty.objects[player_ship_index].coord_id = dirty.coords[coord_index].id;
             dirty.objects[player_ship_index].coord_index = coord_index;
@@ -1952,7 +1952,7 @@ exports.move = move;
                         dirty.players[socket.player_index].has_change = true;
                         // send the updated player info
                         await player.sendInfo(socket, "planet_" + dirty.planet_coords[moving_to_coord_index].planet_id, dirty,
-                            dirty.players[socket.player_index].id);
+                            socket.player_index);
 
                         socket.emit('clear_map');
 
@@ -2030,7 +2030,7 @@ exports.move = move;
                         dirty.players[socket.player_index].planet_coord_id = dirty.planet_coords[moving_to_coord_index].id;
                         dirty.players[socket.player_index].planet_coord_index = moving_to_coord_index;
                         dirty.players[socket.player_index].has_change = true;
-                        await player.sendInfo(socket, "planet_" + dirty.planet_coords[moving_to_coord_index].planet_id, dirty, dirty.players[socket.player_index].id);
+                        await player.sendInfo(socket, "planet_" + dirty.planet_coords[moving_to_coord_index].planet_id, dirty, socket.player_index);
 
                         socket.emit('clear_map');
                         
@@ -2123,7 +2123,7 @@ exports.move = move;
                 dirty.players[socket.player_index].planet_coord_id = dirty.planet_coords[planet_coord_index].id;
                 dirty.players[socket.player_index].planet_coord_index = planet_coord_index;
                 dirty.players[socket.player_index].has_change = true;
-                await player.sendInfo(socket, "planet_" + dirty.planet_coords[planet_coord_index].planet_id, dirty, dirty.players[socket.player_index].id);
+                await player.sendInfo(socket, "planet_" + dirty.planet_coords[planet_coord_index].planet_id, dirty, socket.player_index);
 
 
                 // player moved onto a spaceport tile - remove any battle linkers with them. SAFE.
@@ -2231,7 +2231,11 @@ exports.move = move;
 
                                 
                                 if(dirty.planet_coords[other_planet_coord_index].player_id) {
-                                    await player.sendInfo(socket, false, dirty, dirty.planet_coords[other_planet_coord_index].player_id);
+                                    let other_planet_coord_player_index = await player.getIndex(dirty, { 'player_id': dirty.planet_coords[other_planet_coord_index].player_id });
+                                    if(other_planet_coord_player_index !== -1) {
+                                        await player.sendInfo(socket, false, dirty, other_planet_coord_player_index);
+                                    }
+                                    
                                 }
 
                             }
@@ -2316,7 +2320,7 @@ exports.move = move;
                         dirty.players[data.player_index].has_change = true;
                         // send the updated player info
                         await player.sendInfo(socket, "planet_" + dirty.planet_coords[falling_planet_coord_index].planet_id,
-                            dirty, dirty.players[data.player_index].id);
+                            dirty, data.player_index);
 
                         socket.emit('clear_map');
 
@@ -2767,7 +2771,7 @@ exports.move = move;
                         dirty.players[socket.player_index].has_change = true;
                         // send the updated player info
                         await player.sendInfo(socket, "ship_" + dirty.ship_coords[moving_to_coord_index].ship_id, dirty,
-                            dirty.players[socket.player_index].id);
+                            socket.player_index);
 
                         socket.emit('clear_map');
 
@@ -2810,7 +2814,7 @@ exports.move = move;
                         dirty.players[socket.player_index].ship_coord_id = dirty.ship_coords[moving_to_coord_index].id;
                         dirty.players[socket.player_index].ship_coord_index = moving_to_coord_index;
                         dirty.players[socket.player_index].has_change = true;
-                        await player.sendInfo(socket, "ship_" + dirty.ship_coords[moving_to_coord_index].ship_id, dirty, dirty.players[socket.player_index].id);
+                        await player.sendInfo(socket, "ship_" + dirty.ship_coords[moving_to_coord_index].ship_id, dirty, socket.player_index);
 
                         socket.emit('clear_map');
                         
@@ -3205,7 +3209,7 @@ exports.move = move;
                 dirty.players[player_index].ship_coord_id = dirty.ship_coords[ship_coord_index].id;
                 dirty.players[player_index].ship_coord_index = ship_coord_index;
                 dirty.players[player_index].has_change = true;
-                await player.sendInfo(socket, "ship_" + dirty.ship_coords[ship_coord_index].ship_id, dirty, dirty.players[player_index].id);
+                await player.sendInfo(socket, "ship_" + dirty.ship_coords[ship_coord_index].ship_id, dirty, player_index);
 
 
                 /*
@@ -3292,7 +3296,7 @@ exports.move = move;
     async function moveThroughPortal(socket, dirty, portal_id) {
         try {
 
-            //console.log("In moveThroughPortal");
+            console.log("In moveThroughPortal");
             let portal_index = await game_object.getIndex(dirty, portal_id);
 
             if(portal_index === -1) {
@@ -3342,12 +3346,14 @@ exports.move = move;
             }
 
             let player_index = await player.getIndex(dirty, {'player_id':socket.player_id});
+            let old_room = "";
 
             if(dirty.players[player_index].planet_coord_id) {
                 let previous_planet_coord_index = await main.getPlanetCoordIndex({'planet_coord_id': dirty.players[player_index].planet_coord_id });
                 // Remove the player from the coord that they are on
                 main.updateCoordGeneric(socket, { 'planet_coord_index': previous_planet_coord_index, 'player_id': false });
 
+                old_room = "planet_" + dirty.planet_coords[previous_planet_coord_index].planet_id;
                 socket.leave("planet_" + dirty.planet_coords[previous_planet_coord_index].planet_id);
             } else if(dirty.players[player_index].ship_coord_id) {
                 let previous_ship_coord_index = await main.getShipCoordIndex({'ship_coord_id': dirty.players[player_index].ship_coord_id });
@@ -3355,7 +3361,8 @@ exports.move = move;
                 // Remove the player from the coord that they are on
                 main.updateCoordGeneric(socket, { 'ship_coord_index': previous_ship_coord_index, 'player_id': false });
 
-                socket.leave("ship_" + dirty.ship_coords[previous_ship_coord_index].planet_id);
+                old_room = "ship_" + dirty.ship_coords[previous_ship_coord_index].ship_id;
+                socket.leave("ship_" + dirty.ship_coords[previous_ship_coord_index].ship_id);
             }
 
 
@@ -3371,14 +3378,18 @@ exports.move = move;
                 dirty.players[player_index].previous_ship_coord_id = false;
                 dirty.players[player_index].coord_index = -1;
                 dirty.players[player_index].has_change = true;
-                await player.sendInfo(socket, "planet_" + temp_coord.planet_id, dirty, dirty.players[player_index].id);
-
+                
                 socket.join("planet_" + dirty.planet_coords[moving_to_coord_index].planet_id);
+                console.log("Portaled to planet. Sending updated player info to planet planet_" + temp_coord.planet_id);
+                await player.sendInfo(socket, "planet_" + temp_coord.planet_id, dirty, player_index);
 
                 // We're going to get the planet so we can send a planet type - so we know what monster sprites to dynamically load
                 let moving_to_planet_index = await planet.getIndex(dirty, { 'planet_id': temp_coord.planet_id });
 
                 socket.emit('view_change_data', { 'view': 'planet', 'planet_type_id': dirty.planets[moving_to_planet_index].planet_type_id });
+
+
+                
 
             } else if (moving_to_scope === 'ship') {
 
@@ -3400,12 +3411,18 @@ exports.move = move;
                 dirty.players[player_index].planet_coord_index = -1;
                 dirty.players[player_index].previous_planet_coord_id = false;
                 dirty.players[player_index].has_change = true;
-                await player.sendInfo(socket, "ship_" + dirty.ship_coords[moving_to_coord_index].ship_id, dirty, dirty.players[player_index].id);
+
+                socket.join("ship_" + dirty.ship_coords[moving_to_coord_index].ship_id);
+                await player.sendInfo(socket, "ship_" + dirty.ship_coords[moving_to_coord_index].ship_id, dirty, player_index);
 
                 socket.emit('view_change_data', { 'view': 'ship' });
 
-                socket.join("ship_" + dirty.ship_coords[moving_to_coord_index].ship_id);
+                
             }
+
+            // Make sure anyone we were around knows we moved
+            console.log("Sending updated player info to room: " + old_room);
+            await player.sendInfo({}, old_room, dirty, player_index);
 
             await map.updateMap(socket, dirty);
 
@@ -3521,7 +3538,7 @@ async function payForGalaxyMove(socket, dirty, ship_index) {
             let new_coord_index = await main.getCoordIndex({ 'tile_x': data.x, 'tile_y': data.y });
             await main.updateCoordGeneric(socket, { 'cooord_index': new_coord_index, 'player_id': socket.player_id });
 
-            await player.sendInfo(socket, "galaxy", dirty, dirty.players[player_index].id);
+            await player.sendInfo(socket, "galaxy", dirty, player_index);
 
 
         } else if(data.scope === 'planet') {
@@ -3560,7 +3577,7 @@ async function payForGalaxyMove(socket, dirty, ship_index) {
 
             await main.updateCoordGeneric(socket, { 'planet_coord_index': previous_planet_coord_index, 'player_id': false });
             await main.updateCoordGeneric(socket, {'planet_coord_index': placing_coord_index, 'player_id': dirty.players[player_index].id });
-            await player.sendInfo(socket, "planet_" + dirty.planet_coords[placing_coord_index].planet_id, dirty, dirty.players[player_index].id);
+            await player.sendInfo(socket, "planet_" + dirty.planet_coords[placing_coord_index].planet_id, dirty, player_index);
 
 
         } else {
@@ -3698,9 +3715,9 @@ async function payForGalaxyMove(socket, dirty, ship_index) {
 
 
 
-            await player.sendInfo(socket, false, dirty, dirty.players[player_index].id);
-            await player.sendInfo(false, "galaxy", dirty, dirty.players[player_index].id);
-            await player.sendInfo(false, "planet_" + dirty.planet_coords[spaceport_index].planet_id, dirty, dirty.players[player_index].id);
+            await player.sendInfo(socket, false, dirty, player_index);
+            await player.sendInfo(false, "galaxy", dirty, player_index);
+            await player.sendInfo(false, "planet_" + dirty.planet_coords[spaceport_index].planet_id, dirty, player_index);
 
             // immediately update the map for the socket
             await map.updateMap(socket, dirty);
@@ -4175,8 +4192,8 @@ async function payForGalaxyMove(socket, dirty, ship_index) {
                     await game_object.place(socket, dirty, { 'object_index': player_ship_index, 'coord_index': placing_galaxy_coord_index });
                     //await main.updateCoordGeneric(socket, { 'coord_index': placing_galaxy_coord_index, 'player_id': socket.player_id,
                     //    'object_id': dirty.players[player_index].ship_id});
-                    await player.sendInfo(socket, "galaxy", dirty, dirty.players[player_index].id);
-                    await player.sendInfo(socket, "ship_" + dirty.ship_coords[ship_coord_index].ship_id, dirty, dirty.players[player_index].id);
+                    await player.sendInfo(socket, "galaxy", dirty, player_index);
+                    await player.sendInfo(socket, "ship_" + dirty.ship_coords[ship_coord_index].ship_id, dirty, player_index);
 
 
                     socket.emit('view_change_data', { 'view': 'galaxy' });
@@ -4203,8 +4220,8 @@ async function payForGalaxyMove(socket, dirty, ship_index) {
                     await main.updateCoordGeneric(socket, { 'ship_coord_index':ship_coord_index, 'player_id': false });
                     await main.updateCoordGeneric(socket, { 'coord_index': ship_galaxy_coord_index, 'player_id': socket.player_id
                     });
-                    await player.sendInfo(socket, "galaxy", dirty, dirty.players[player_index].id);
-                    await player.sendInfo(socket, "ship_" + dirty.ship_coords[ship_coord_index].ship_id, dirty, dirty.players[player_index].id);
+                    await player.sendInfo(socket, "galaxy", dirty, player_index);
+                    await player.sendInfo(socket, "ship_" + dirty.ship_coords[ship_coord_index].ship_id, dirty, player_index);
 
 
                     socket.join('galaxy');
@@ -4390,9 +4407,9 @@ async function payForGalaxyMove(socket, dirty, ship_index) {
 
                 socket.join("ship_" + dirty.ship_coords[ship_coord_index].ship_id);
 
-                await player.sendInfo(socket, "ship_" + dirty.ship_coords[ship_coord_index].ship_id, dirty, dirty.players[player_index].id);
+                await player.sendInfo(socket, "ship_" + dirty.ship_coords[ship_coord_index].ship_id, dirty, player_index);
                 // Players in the galaxy need to know that the player isn't in the galaxy anymore too
-                await player.sendInfo(socket, "galaxy", dirty, dirty.players[player_index].id);
+                await player.sendInfo(socket, "galaxy", dirty, player_index);
 
 
                 socket.emit('view_change_data', { 'view': 'ship'});
@@ -4457,7 +4474,7 @@ async function payForGalaxyMove(socket, dirty, ship_index) {
 
             socket.join("virtual");
 
-            await player.sendInfo(socket, "virtual", dirty, dirty.players[socket.player_index].id);
+            await player.sendInfo(socket, "virtual", dirty, socket.player_index);
 
             socket.emit('view_change_data', { 'view': 'virtual'});
             await map.updateMap(socket, dirty);

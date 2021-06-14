@@ -41,6 +41,10 @@ async function calculateDefense(dirty, object_index, damage_types = []) {
 
             for(let i = 0; i < damage_types.length; i++) {
 
+                if(damage_types[i] === 'explosion' && dirty.object_types[object_type_index].explosion_defense_modifier) {
+                    defense += dirty.object_types[object_type_index].explosion_defense_modifier;
+                }
+
                 if(damage_types[i] === 'heat' && dirty.object_types[object_type_index].heat_defense_modifier) {
                     defense += dirty.object_types[object_type_index].heat_defense_modifier;
                 }
@@ -49,38 +53,6 @@ async function calculateDefense(dirty, object_index, damage_types = []) {
 
 
         }
-
-
-        /*
-        if(dirty.object_types[object_type_index].is_ship) {
-            // Find ship coords with shields
-            let shield_generator_coords = dirty.ship_coords.filter(ship_coord => ship_coord.ship_id === dirty.objects[object_index].id &&
-                ship_coord.object_type_id === 48 );
-
-            if(shield_generator_coords.length > 0) {
-
-                let found_energy_source = false;
-
-                for(let shield_coord of shield_generator_coords) {
-
-                    if(!found_energy_source) {
-                        let coord_object_index = await getIndex(dirty, shield_coord.object_id);
-                        if(coord_object_index !== -1 && dirty.objects[coord_object_index].energy > 1 ) {
-
-                            console.log("Found energy source for shield defense");
-                            found_energy_source = true;
-                            defense += 5;
-
-                            dirty.objects[coord_object_index].energy -= 1;
-                            dirty.objects[coord_object_index].has_change = true;
-                        }
-                    }
-
-                }
-            }
-        }
-
-        */
 
         //console.log("Returning defense of: " + defense);
 

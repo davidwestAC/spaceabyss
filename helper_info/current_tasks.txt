@@ -11,6 +11,13 @@ DOING NOW:
     Whenever I see a getPlanetCoordIndex, getShipCoordIndex, getCoordIndex, see if it's on a monster,object, or player, and switch it to TYPE.getCoordIndex()
 
 
+
+    Destroyer movement is weird when someone else is moving it.
+
+    need to add in damage type for floors
+
+    damage on mining failure based on skill difference
+
     Galaxy events aren't spawning? (or the frzon planet has one)
 
 
@@ -24,10 +31,8 @@ DOING NOW:
 
     Check out the rest of luke's commits
 
-    What if a player had an AI rule to not allow building of object, and then destroyed their stairs?
-        Could have actions that an AI disallows bypass the AI if it doesn't have enough energy. Or the AI could spawn something to attack the placed object.
-        (I think it would need to be the AI attacks the spawned object. Becasue a player could put ALL their AI's stuff on a higher level)
-
+ 
+    cancel button for manufacturing that refunds
 
     Lets add some stuff to the inferno planet
 
@@ -37,11 +42,6 @@ DOING NOW:
 
     I wouldn't hate players being able to drive through and explode salvagable stuff
 
-
-    Galaxy coords that players moved through are weird
-
-    Cadian's ship got left in the galaxy. 
-        I think maybe this happens when you know it's in the galaxy, and they log off while you are off screen? Or different room? (in ship view?)
 
 
     Add in trash asteroid

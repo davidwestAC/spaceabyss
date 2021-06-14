@@ -117,6 +117,8 @@ PIERCING
                     Fernblade
 
 POISON (For these weapons, we can design some that do no initial damage - just stack poison)
+        Bio Gun
+            Bio Rifle
                 Jelly Rod
 
 PLASMA

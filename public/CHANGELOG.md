@@ -1,3 +1,28 @@
+## [0.2.45] - 2021-06-14
+
+### Added
+- Poison Sac
+- Bio Gun
+- Bio Rifle
+- Inferno player body
+- Acid player body
+- Voon Mech
+- Growing Abomination
+
+### Changed
+- Converted Mechanoids can now drop Microcontrollers
+- Corrupted Scientists can now drop Poison Sacs
+- Blossomtis can now drop Poison Sacs
+- Cherree can now drop Poison Sacs
+- Improved the player.sendInfo function
+- Manufacturing now has an increased cost instead of a failure chance when your skill is close, but not quite at the complexity of what you are manufacturing. 
+- Mining in Space Abyss is now more volitile! If your mining skill is lower than the complexity of what you are mining, you will take damage. This is explosion damage, and mining ships now have added defense against it. It was never really my intention that players could spam mining skill by just mining on a diamond asteroid for forever :D
+
+### Fixed
+- Inferno Cores not stacking
+- Manufacturing Augments now show the manufacturing skill they add in the equipment display
+- Multiple cases of player sprites not updated properly. Mostly related to stairs and portals.
+
 ## [0.2.44] - 2021-04-16
 
 

@@ -138,6 +138,21 @@
             margin: 0;
         }
 
+        div.assembly-item {
+            display:inline-grid;
+            margin:10px;
+            min-width:180px;
+            min-height:200px;
+            max-width:180px;
+            text-align: center;
+            border-radius:6px;
+        }
+
+        div.assembly-item-container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
         div.chat {
             width:100%; height:100px; background:#e8e8e8; overflow:auto;
         }
@@ -795,7 +810,6 @@
     var chat_system = [];
 
     var coords = [];
-    var eating_linkers = [];
     var elevator_linkers = [];
     var equipment_linkers = [];
     var corporations = [];
@@ -2725,13 +2739,20 @@
                     players[i].frames_to_idle--;
 
                     if(players[i].frames_to_idle <= 0) {
-                        if(players[i].sprite.texture.key === 'player-galaxy') {
+
+                        if(players[i].sprite.texture.key == 'player-acid') {
+                            players[i].sprite.anims.play('player-acid-idle-animation');
+                        } 
+                        else if(players[i].sprite.texture.key === 'player-galaxy') {
                             players[i].sprite.anims.play('player-galaxy-idle-animation');
                         } 
                         else if(players[i].sprite.texture.key === 'player-human') {
                             //console.log("Switching back to idle");
                             players[i].sprite.anims.play('player-human-idle-animation');
                         } 
+                        else if(players[i].sprite.texture.key === 'player-inferno') {
+                            players[i].sprite.anims.play('player-inferno-idle-animation');
+                        }
                         else if(players[i].sprite.texture.key === 'player-manufacturing') {
                             players[i].sprite.anims.play('player-manufacturing-idle-animation');
                         } 
